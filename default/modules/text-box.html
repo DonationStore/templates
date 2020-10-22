@@ -1,0 +1,15 @@
+{% load cart %}
+
+{% load modules %}
+
+{% text_box_module module as text_box %}
+ <div class="card">
+    <div class="card-header">
+        {{ module.header }}
+    </div>
+    <div class="card-body">
+        {{ text_box.text|safe }}
+    </div>
+</div>
+<br/>
+

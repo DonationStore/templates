@@ -1,0 +1,50 @@
+{% extends "store/default/base.html" %}
+
+{% block title %}{{ webstore.name }} | Payment Complete{% endblock %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load currency %}
+
+{% block content %}
+
+    {% include 'store/default/nav.html' %}
+
+    <!-- Break -->
+    <br/>
+
+    <!-- Main Login Content -->
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Start Payment Cancelled -->
+        <div class="card">
+            <div class="card-header">
+                Payment Complete
+            </div>
+            <div class="card-body">
+                {% if webstore.payment_complete_page %}
+                    <p>{{ webstore.payment_complete_page|safe }}</p>
+                {% else %}
+                    <p>Thank you for your payment. It may take a few moments for us to receive back a response from the payment gateway you chose. <br/><br/>
+                        To receive your purchase please login to our server and wait, you will be awarded within the next 5 minutes.<br/><br/>
+
+                        Thank you for purchasing items with us today.</p>
+                {% endif %}
+            </div>
+        </div>
+        <!-- End Payment Cancelled -->
+
+    </div>
+    <!-- End Main Login Content -->
+
+    {% include 'store/default/footer.html' %}
+
+{% endblock %}

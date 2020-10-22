@@ -1,0 +1,112 @@
+{% extends "store/default/base.html" %}
+
+{% block title %}{{ webstore.name }} | {{ language.translations.view_support_ticket }}{% endblock %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load currency %}
+
+{% block content %}
+
+    {% include 'store/default/nav.html' %}
+
+    <!-- Break -->
+    <br/>
+
+    <!-- Main Login Content -->
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <div class="float-right">
+                    {% if ticket.status == 'O' %}
+                        <span class="badge badge-success">{{ language.translations.open }}</span>
+                    {% else %}
+                        <span class="badge badge-danger">{{ language.translations.closed }}</span>
+                    {% endif %}
+                </div>
+                View Ticket #{{ ticket.id }}
+
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5">
+                        <h3>Your Details</h3>
+                        <table class="table table-striped">
+                            <thead>
+                            <tbody>
+                            <tr>
+                                <th>{{ language.translations.name }}</th>
+                                <td>{{ ticket.requester_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ language.translations.minecraft_ign }}</th>
+                                <td>{{ ticket.requester_ign }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ language.translations.email_address }}</th>
+                                <td>{{ ticket.requester_email }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ language.translations.pin }}</th>
+                                <td>{{ ticket.pin }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card">
+                            <div class="card-header bg-transparent border-success">Original Message</div>
+                            <div class="card-body">
+                                {{ ticket.body }}
+                            </div>
+                        </div>
+                        <br/>
+                        <h3>{{ language.translations.replies }}</h3>
+                        {% for reply in ticket_replies %}
+                            <div class="card {% if reply.responder_type == 'S'%} bg-transparent border-warning{% endif %}">
+                                <div class="card-body">
+                                    {{ reply.body }}
+                                    <br/>
+                                    <div class="float-right">
+                                        {% if reply.responder_type == 'S'%} {{ language.translations.staff_reply_from }} {{ reply.responder_name }} <small>{{ language.translations.at }} {{ reply.response_time }}</small>{% else %}{{ language.translations.your_reply }}{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <br/>
+                        {% endfor %}
+                        <br/>
+                        <h3>{{ language.translations.add_reply }}</h3>
+                        {% if ticket.status == 'O' %}
+                            <form name="add_reply" action="" method="post">
+                                <div class="form-group">
+                                    <textarea class="form-control" name="response" placeholder="{{ language.translations.enter_your_response }}" required="required"></textarea>
+                                    <input type="hidden" name="pin" value="{{ ticket.pin }}">
+                                    <input type="hidden" name="minecraft_ign" value="{{ ticket.requester_ign }}">
+                                </div>
+                                <br/>
+                                <div class="g-recaptcha" data-sitekey="{{ webstore.recaptcha_site_key }}"></div><br/>
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-block">{{ language.translations.add_reply }}</button>
+                            </form>
+                        {% else %}
+                            <i>{{ language.translations.cannot_add_reply }}</i>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Main Login Content -->
+
+    {% include 'store/default/footer.html' %}
+
+{% endblock %}

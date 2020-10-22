@@ -1,0 +1,64 @@
+{% extends 'store/default/base.html' %}
+
+{% block title %}{{ webstore.name }} | Welcome{% endblock %}
+
+{% block content %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load modules %}
+
+{% load currency %}
+
+{% include 'store/default/nav.html' %}
+
+    <!-- Break -->
+    <br/>
+
+    <!-- Home Page Content -->
+    <div class="container">
+        {# Messages to the user #}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        {{ language.translations.welcome_to_the }} {{ webstore.name }} {{ language.translations.store }}
+                    </div>
+                    <div class="card-body">
+                        {{ webstore.homepage_message|safe }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                {% if webstore.support_tickets %}
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <p class="lead">{{ language.translations.need_support }}
+                            <hr/>{{ language.translations.contact_us_by_support }}
+                            </p>
+                            <a href="/support" class="btn btn-secondary btn-block">{{ language.translations.let_me_open_a_support_ticket }}</a>
+                        </div>
+                    </div>
+                {% endif %}
+                <br/>
+                {% for module in modules %}
+                    {% if module.on_homepage %}
+                        {% include module|template %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- End Home Page Content -->
+
+    {% include 'store/default/footer.html' %}
+
+{% endblock %}

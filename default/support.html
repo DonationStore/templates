@@ -1,0 +1,122 @@
+{% extends "store/default/base.html" %}
+
+{% block title %}{{ webstore.name }} | Support{% endblock %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load currency %}
+
+{% block content %}
+
+{% include 'store/default/nav.html' %}
+
+    <!-- Break -->
+    <br/>
+
+    <!-- Support Center -->
+    <div class="container">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <p>{{ language.translations.welcome_to_support }}</p>
+
+        {% if webstore.recaptcha_site_key %}
+
+            <ul class="nav nav-pills mb-3 nav-fill" id="pills-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="pills-submit-tab" data-toggle="pill" href="#pills-submit" role="tab" aria-controls="pills-submit" aria-selected="true">{{ language.translations.submit_ticket }}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-view-tab" data-toggle="pill" href="#pills-view" role="tab" aria-controls="pills-view" aria-selected="false">{{ language.translations.view_support_ticket }}</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-submit" role="tabpanel" aria-labelledby="pills-home-tab">
+
+                    <div class="card">
+                        <div class="card-body">
+                            <p>{{ language.translations.if_payment }}</p>
+
+                            <form name="view_ticket" action="/submit-ticket" method="post">
+                                <div class="form-group">
+                                    <input type="text" name="name" class="form-control" placeholder="{{ language.translations.name }}">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" name="minecraft_ign" class="form-control" placeholder="{{ language.translations.your_minecraft_ign }}">
+                                </div>
+                                <div class="form-group">
+                                    <select class="form-control" name="urgency">
+                                        <option value="L">Low</option>
+                                        <option value="N">Normal</option>
+                                        <option value="H">High</option>
+                                        <option value="U">Urgent</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" name="email" class="form-control" placeholder="{{ language.translations.email_address }}">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" name="subject" class="form-control" placeholder="{{ language.translations.subject }}">
+                                </div>
+                                <div class="form-group">
+                                    <textarea name="description" class="form-control" placeholder="{{ language.translations.describe_your_problem }}"></textarea>
+                                </div>
+                                {% csrf_token %}
+
+                                <div class="g-recaptcha" data-sitekey="{{ webstore.recaptcha_site_key }}"></div><br/>
+
+                                {{ language.translations.emailed_pin }}<br/><br/>
+
+                                <button class="btn btn-secondary btn-block" type="submit">{{ language.translations.submit_ticket }}</button>
+                            </form>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="tab-pane fade" id="pills-view" role="tabpanel" aria-labelledby="pills-profile-tab">
+
+                    <div class="card">
+                        <div class="card-body">
+                            <p>{{ language.translations.enter_ticket_details }}</p>
+
+                            <form name="view_ticket" action="/view-ticket" method="post">
+                                <div class="form-group">
+                                    <input type="text" name="minecraft_ign" class="form-control" placeholder="{{ language.translations.your_minecraft_ign }}">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" name="pin" class="form-control" placeholder="{{ language.translations.pin }}">
+                                </div>
+
+                                <div class="g-recaptcha" data-sitekey="{{ webstore.recaptcha_site_key }}"></div><br/>
+
+                                {% csrf_token %}
+                                <button class="btn btn-secondary btn-block" type="submit">{{ language.translations.view_support_ticket }}</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        {% else %}
+
+            <p>
+                Cannot display support area as the reCaptcha site key has not been set. If you have not set it please do so now in your control panel.<br/><br/>
+                If you are unsure as to how to get a site key, please follow <a href="https://donationstore.net/docs/Configuration/Setup-reCaptcha">this tutorial.</a> <br/>
+            </p>
+
+        {% endif %}
+    </div>
+    <!-- End Support Centre -->
+
+    {% include 'store/default/footer.html' %}
+
+{% endblock %}

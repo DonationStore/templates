@@ -1,0 +1,43 @@
+{% extends "store/default/base.html" %}
+
+{% block title %}{{ webstore.name }} | {{ language.translations.terms_and_conditions }}{% endblock %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load currency %}
+
+{% block content %}
+
+    {% include 'store/default/nav.html' %}
+
+    <!-- Break -->
+    <br/>
+
+    <!-- Main Login Content -->
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Terms and Conditions -->
+        <div class="container">
+            <div class="card">
+                <div class="card-header">{{ language.translations.terms_and_conditions }}</div>
+                <div class="card-body">
+                    <p>{{ webstore.terms_and_conditions|safe }}</p>
+                </div>
+            </div>
+        </div>
+        <!-- End Terms and Conditions -->
+
+    </div>
+    <!-- End Main Login Content -->
+
+    {% include 'store/default/footer.html' %}
+
+{% endblock %}

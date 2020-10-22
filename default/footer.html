@@ -1,0 +1,50 @@
+<!-- Footer -->
+<footer class="footer">
+    <br/>
+    <div class="container">
+        <hr/>
+        <div class="row">
+            <div class="col-md-5">
+                {% if webstore.logo %}
+                    <a href="/"><img style='float:left;height:50px; margin-right:10px;' src="/{{ webstore.logo }}" height="60"/></a>
+                {% else %}
+                    <img style='float:left;height:50px; margin-right:10px;' src="/static/assets/images/logo.png" width="300"><br/>
+                    This logo has not been set yet. Set it in your control panel.
+                {% endif %}
+                &copy; <script>document.write(new Date().getFullYear())</script> {{ webstore.name }}
+                <br/>
+                Powered by <a href="http://donationstore.net">Donation Store</a>
+            </div>
+            <div class="col-md-7">
+                <div class="float-right">
+                    <a href="/terms-and-conditions" class="btn btn-light"><i class="fa fa-file-signature"></i> {{ language.translations.terms_and_conditions }}</a>
+
+                    <a href="/privacy-policy" class="btn btn-light"><i class="fa fa-lock"></i> {{ language.translations.privacy_policy }}</a>
+
+                    <div class="btn-group dropup">
+                        <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-globe"></i> {{ language.translations.language }}
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/language/bg_BG?next={% firstof request.path '/' %}">Bulgarian <div class="float-right">{% if request.session.language %}{% if request.session.language == 'bg_BG' %}<i class="fa fa-check"></i> {% endif %}{% endif %}</div></a>
+                            <a class="dropdown-item" href="/language/nl_NL?next={% firstof request.path '/' %}">Dutch <div class="float-right">{% if request.session.language %}{% if request.session.language == 'nl_NL' %}<i class="fa fa-check"></i>{% endif %}{% endif %}</div></a>
+                            <a class="dropdown-item" href="/language/en_IE?next={% firstof request.path '/' %}">English <div class="float-right">{% if request.session.language %}{% if request.session.language == 'en_IE' %}<i class="fa fa-check"></i> {% endif %}{% endif %}</div></a>
+                            <a class="dropdown-item" href="/language/et_EE?next={% firstof request.path '/' %}">Estonian <div class="float-right">{% if request.session.language %}{% if request.session.language == 'et_EE' %}<i class="fa fa-check"></i> {% endif %}{% endif %}</div></a>
+                            <a class="dropdown-item" href="/language/fi_FI?next={% firstof request.path '/' %}">Finnish <div class="float-right">{% if request.session.language %}{% if request.session.language == 'fi_FI' %}<i class="fa fa-check"></i> {% endif %}{% endif %}</div></a>
+                            <a class="dropdown-item" href="/language/fr_FR?next={% firstof request.path '/' %}">French <div class="float-right">{% if request.session.language %}{% if request.session.language == 'fr_FR' %}<i class="fa fa-check"></i> {% endif %}{% endif %}</div>
+                            <a class="dropdown-item" href="/language/de_DE?next={% firstof request.path '/' %}">German <div class="float-right">{% if request.session.language %}{% if request.session.language == 'de_DE' %}<i class="fa fa-check"></i> {% endif %}{% endif %}</div></a>
+                            <a class="dropdown-item" href="/language/is_IS?next={% firstof request.path '/' %}">Icelandic <div class="float-right">{% if request.session.language %}{% if request.session.language == 'is_IS' %}<i class="fa fa-check"></i>{% endif %}{% endif %}</div></a>
+                            <a class="dropdown-item" href="/language/it_IT?next={% firstof request.path '/' %}">Italian <div class="float-right">{% if request.session.language %}{% if request.session.language == 'it_IT' %}<i class="fa fa-check"></i>{% endif %}{% endif %}</div></a>
+                            <a class="dropdown-item" href="/language/pt_PT?next={% firstof request.path '/' %}">Portuguese <div class="float-right">{% if request.session.language %}{% if request.session.language == 'pt_PT' %}<i class="fa fa-check"></i> {% endif %}{% endif %}</div></a>
+                            <a class="dropdown-item" href="/language/ro_RO?next={% firstof request.path '/' %}">Romanian <div class="float-right">{% if request.session.language %}{% if request.session.language == 'ro_RO' %}<i class="fa fa-check"></i> {% endif %}{% endif %}</div></a>
+                            <a class="dropdown-item" href="/language/es_ES?next={% firstof request.path '/' %}">Spanish <div class="float-right">{% if request.session.language %}{% if request.session.language == 'es_ES' %}<i class="fa fa-check"></i> {% endif %}{% endif %}</div></a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <br/><br/>
+</footer>
+<!-- End Footer -->

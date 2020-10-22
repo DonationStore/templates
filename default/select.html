@@ -1,0 +1,97 @@
+{% extends "store/default/base.html" %}
+
+{% block title %}{{ webstore.name }} | Select{% endblock %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load modules %}
+
+{% load currency %}
+
+{% block content %}
+
+    {% include 'store/default/nav.html' %}
+
+    <br/>
+
+    <!-- Main Login Content -->
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">{{ package_obj.name }}</div>
+                    <div class="card-body">
+                        <p>{{ language.translations.need_details }}</p>
+                        <form name="option-form" action="" method="post">
+                            {% if allow_customer_change_price %}
+                                <div class="input-group mb-3">
+                                    <input type="number" step="0.01" name="customers_price" placeholder="{{ language.translations.please_enter_price }}" class="form-control form-control-lg">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="basic-addon2">{{ webstore.currency }}</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if choose_server_to_execute %}
+                                <div class="form-group">
+                                    <label for="server_to_execute">{{ language.translations.server_to_receive }}</label>
+                                    <select class="form-control form-control-lg" id="server_to_execute" name="server_to_execute">
+                                        {% for server in servers %}
+                                            <option value="{{ server.id }}">{{ server.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+
+                            {% for variable in variables %}
+                                {# If alphanumeric #}
+                                <div class="form-group">
+                                    {% if variable.type == "D" %}
+                                        <strong>{{ variable.description }}</strong>
+                                        {% autoescape off %}
+                                            {% construct_dropdown variable.options webstore %}
+                                        {% endautoescape %}
+                                    {% else %}
+                                        <input {% if variable.type == "A" %}type="text"{% elif variable.type == "N" %}type="number"{% elif variable.type == "E" %}type="email"{% else %}type="text"{% endif %}
+                                               class="form-control form-control-lg" placeholder="{{ variable.description }}" id="{{ variable.identifier }}" name="variable" maxlength="{{ variable.maximum_length }}" required>
+                                    {% endif %}
+                                </div>
+                                <input type="hidden" value="{{ variable.id }}" name="variable_id"/>
+                            {% endfor %}
+
+                            <input type="hidden" name="package_id" value="{{ package.id }}"/>
+                            {% csrf_token %}
+
+                            {# Create the vars input that holds the names of the variables that will be parsed later #}
+                            <div class="row">
+                                <div class="col-md-6"><a href="/category/{{ package.category.id }}" class="btn btn-danger btn-block">{{ language.translations.cancel }}</a></div>
+                                <div class="col-md-6"><input type="submit" class="btn btn-success btn-block" value="{{ language.translations.continue }}"/></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                {% for module in modules %}
+                    {% if module.on_homepage %}
+                        {% include module|template %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- End Main Login Content -->
+
+    {% include 'store/default/footer.html' %}
+
+{% endblock %}
+

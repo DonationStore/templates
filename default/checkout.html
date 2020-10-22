@@ -1,0 +1,1113 @@
+{% extends "store/default/base.html" %}
+
+{% block title %}{{ webstore.name }} | {{ language.translations.checkout }}{% endblock %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load currency %}
+
+{% block content %}
+
+    {% include 'store/default/nav.html' %}
+
+    <br/>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">{{ language.translations.your_details }}</span>
+                </h4>
+
+                <form name="purchase_form" id="purchase_form" action="/checkout/pay"
+                      method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="first_name">{{ language.translations.first_name }}</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="last_name">{{ language.translations.last_name }}</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <label for="email">{{ language.translations.email_address }}</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                        </div>
+                        <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp"
+                               required>
+                    </div>
+
+                    {% if webstore.require_billing_details %}
+                        <br/>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="address_line_1">{{ language.translations.address_line_1 }}</label>
+                                    <input type="text" class="form-control" id="address_line_1" name="address_line_1"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="address_line_2">{{ language.translations.address_line_2 }}</label>
+                                    <input type="text" class="form-control" id="address_line_2" name="address_line_2"
+                                           required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="city">{{ language.translations.city }}</label>
+                                    <input type="text" class="form-control" id="city" name="city" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="country">{{ language.translations.country }}</label>
+                                    <select class="form-control" id="country" name="country" required>
+                                        <option value="Afghanistan">Afghanistan</option>
+                                        <option value="Åland Islands">Åland Islands</option>
+                                        <option value="Albania">Albania</option>
+                                        <option value="Algeria">Algeria</option>
+                                        <option value="American Samoa">American Samoa</option>
+                                        <option value="Andorra">Andorra</option>
+                                        <option value="Angola">Angola</option>
+                                        <option value="Anguilla">Anguilla</option>
+                                        <option value="Antarctica">Antarctica</option>
+                                        <option value="Antigua and Barbuda">Antigua and Barbuda</option>
+                                        <option value="Argentina">Argentina</option>
+                                        <option value="Armenia">Armenia</option>
+                                        <option value="Aruba">Aruba</option>
+                                        <option value="Australia">Australia</option>
+                                        <option value="Austria">Austria</option>
+                                        <option value="Azerbaijan">Azerbaijan</option>
+                                        <option value="Bahamas">Bahamas</option>
+                                        <option value="Bahrain">Bahrain</option>
+                                        <option value="Bangladesh">Bangladesh</option>
+                                        <option value="Barbados">Barbados</option>
+                                        <option value="Belarus">Belarus</option>
+                                        <option value="Belgium">Belgium</option>
+                                        <option value="Belize">Belize</option>
+                                        <option value="Benin">Benin</option>
+                                        <option value="Bermuda">Bermuda</option>
+                                        <option value="Bhutan">Bhutan</option>
+                                        <option value="Bolivia">Bolivia</option>
+                                        <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+                                        <option value="Botswana">Botswana</option>
+                                        <option value="Bouvet Island">Bouvet Island</option>
+                                        <option value="Brazil">Brazil</option>
+                                        <option value="British Indian Ocean Territory">British Indian Ocean Territory</option>
+                                        <option value="Brunei Darussalam">Brunei Darussalam</option>
+                                        <option value="Bulgaria">Bulgaria</option>
+                                        <option value="Burkina Faso">Burkina Faso</option>
+                                        <option value="Burundi">Burundi</option>
+                                        <option value="Cambodia">Cambodia</option>
+                                        <option value="Cameroon">Cameroon</option>
+                                        <option value="Canada">Canada</option>
+                                        <option value="Cape Verde">Cape Verde</option>
+                                        <option value="Cayman Islands">Cayman Islands</option>
+                                        <option value="Central African Republic">Central African Republic</option>
+                                        <option value="Chad">Chad</option>
+                                        <option value="Chile">Chile</option>
+                                        <option value="China">China</option>
+                                        <option value="Christmas Island">Christmas Island</option>
+                                        <option value="Cocos (Keeling) Islands">Cocos (Keeling) Islands</option>
+                                        <option value="Colombia">Colombia</option>
+                                        <option value="Comoros">Comoros</option>
+                                        <option value="Congo">Congo</option>
+                                        <option value="Congo, The Democratic Republic of The">Congo, The Democratic Republic of The</option>
+                                        <option value="Cook Islands">Cook Islands</option>
+                                        <option value="Costa Rica">Costa Rica</option>
+                                        <option value="Cote D'ivoire">Cote D'ivoire</option>
+                                        <option value="Croatia">Croatia</option>
+                                        <option value="Cuba">Cuba</option>
+                                        <option value="Cyprus">Cyprus</option>
+                                        <option value="Czech Republic">Czech Republic</option>
+                                        <option value="Denmark">Denmark</option>
+                                        <option value="Djibouti">Djibouti</option>
+                                        <option value="Dominica">Dominica</option>
+                                        <option value="Dominican Republic">Dominican Republic</option>
+                                        <option value="Ecuador">Ecuador</option>
+                                        <option value="Egypt">Egypt</option>
+                                        <option value="El Salvador">El Salvador</option>
+                                        <option value="Equatorial Guinea">Equatorial Guinea</option>
+                                        <option value="Eritrea">Eritrea</option>
+                                        <option value="Estonia">Estonia</option>
+                                        <option value="Ethiopia">Ethiopia</option>
+                                        <option value="Falkland Islands (Malvinas)">Falkland Islands (Malvinas)</option>
+                                        <option value="Faroe Islands">Faroe Islands</option>
+                                        <option value="Fiji">Fiji</option>
+                                        <option value="Finland">Finland</option>
+                                        <option value="France">France</option>
+                                        <option value="French Guiana">French Guiana</option>
+                                        <option value="French Polynesia">French Polynesia</option>
+                                        <option value="French Southern Territories">French Southern Territories</option>
+                                        <option value="Gabon">Gabon</option>
+                                        <option value="Gambia">Gambia</option>
+                                        <option value="Georgia">Georgia</option>
+                                        <option value="Germany">Germany</option>
+                                        <option value="Ghana">Ghana</option>
+                                        <option value="Gibraltar">Gibraltar</option>
+                                        <option value="Greece">Greece</option>
+                                        <option value="Greenland">Greenland</option>
+                                        <option value="Grenada">Grenada</option>
+                                        <option value="Guadeloupe">Guadeloupe</option>
+                                        <option value="Guam">Guam</option>
+                                        <option value="Guatemala">Guatemala</option>
+                                        <option value="Guernsey">Guernsey</option>
+                                        <option value="Guinea">Guinea</option>
+                                        <option value="Guinea-bissau">Guinea-bissau</option>
+                                        <option value="Guyana">Guyana</option>
+                                        <option value="Haiti">Haiti</option>
+                                        <option value="Heard Island and Mcdonald Islands">Heard Island and Mcdonald Islands</option>
+                                        <option value="Holy See (Vatican City State)">Holy See (Vatican City State)</option>
+                                        <option value="Honduras">Honduras</option>
+                                        <option value="Hong Kong">Hong Kong</option>
+                                        <option value="Hungary">Hungary</option>
+                                        <option value="Iceland">Iceland</option>
+                                        <option value="India">India</option>
+                                        <option value="Indonesia">Indonesia</option>
+                                        <option value="Iran, Islamic Republic of">Iran, Islamic Republic of</option>
+                                        <option value="Iraq">Iraq</option>
+                                        <option value="Ireland">Ireland</option>
+                                        <option value="Isle of Man">Isle of Man</option>
+                                        <option value="Israel">Israel</option>
+                                        <option value="Italy">Italy</option>
+                                        <option value="Jamaica">Jamaica</option>
+                                        <option value="Japan">Japan</option>
+                                        <option value="Jersey">Jersey</option>
+                                        <option value="Jordan">Jordan</option>
+                                        <option value="Kazakhstan">Kazakhstan</option>
+                                        <option value="Kenya">Kenya</option>
+                                        <option value="Kiribati">Kiribati</option>
+                                        <option value="Korea, Democratic People's Republic of">Korea, Democratic People's Republic of</option>
+                                        <option value="Korea, Republic of">Korea, Republic of</option>
+                                        <option value="Kuwait">Kuwait</option>
+                                        <option value="Kyrgyzstan">Kyrgyzstan</option>
+                                        <option value="Lao People's Democratic Republic">Lao People's Democratic Republic</option>
+                                        <option value="Latvia">Latvia</option>
+                                        <option value="Lebanon">Lebanon</option>
+                                        <option value="Lesotho">Lesotho</option>
+                                        <option value="Liberia">Liberia</option>
+                                        <option value="Libyan Arab Jamahiriya">Libyan Arab Jamahiriya</option>
+                                        <option value="Liechtenstein">Liechtenstein</option>
+                                        <option value="Lithuania">Lithuania</option>
+                                        <option value="Luxembourg">Luxembourg</option>
+                                        <option value="Macao">Macao</option>
+                                        <option value="Macedonia, The Former Yugoslav Republic of">Macedonia, The Former Yugoslav Republic of</option>
+                                        <option value="Madagascar">Madagascar</option>
+                                        <option value="Malawi">Malawi</option>
+                                        <option value="Malaysia">Malaysia</option>
+                                        <option value="Maldives">Maldives</option>
+                                        <option value="Mali">Mali</option>
+                                        <option value="Malta">Malta</option>
+                                        <option value="Marshall Islands">Marshall Islands</option>
+                                        <option value="Martinique">Martinique</option>
+                                        <option value="Mauritania">Mauritania</option>
+                                        <option value="Mauritius">Mauritius</option>
+                                        <option value="Mayotte">Mayotte</option>
+                                        <option value="Mexico">Mexico</option>
+                                        <option value="Micronesia, Federated States of">Micronesia, Federated States of</option>
+                                        <option value="Moldova, Republic of">Moldova, Republic of</option>
+                                        <option value="Monaco">Monaco</option>
+                                        <option value="Mongolia">Mongolia</option>
+                                        <option value="Montenegro">Montenegro</option>
+                                        <option value="Montserrat">Montserrat</option>
+                                        <option value="Morocco">Morocco</option>
+                                        <option value="Mozambique">Mozambique</option>
+                                        <option value="Myanmar">Myanmar</option>
+                                        <option value="Namibia">Namibia</option>
+                                        <option value="Nauru">Nauru</option>
+                                        <option value="Nepal">Nepal</option>
+                                        <option value="Netherlands">Netherlands</option>
+                                        <option value="Netherlands Antilles">Netherlands Antilles</option>
+                                        <option value="New Caledonia">New Caledonia</option>
+                                        <option value="New Zealand">New Zealand</option>
+                                        <option value="Nicaragua">Nicaragua</option>
+                                        <option value="Niger">Niger</option>
+                                        <option value="Nigeria">Nigeria</option>
+                                        <option value="Niue">Niue</option>
+                                        <option value="Norfolk Island">Norfolk Island</option>
+                                        <option value="Northern Mariana Islands">Northern Mariana Islands</option>
+                                        <option value="Norway">Norway</option>
+                                        <option value="Oman">Oman</option>
+                                        <option value="Pakistan">Pakistan</option>
+                                        <option value="Palau">Palau</option>
+                                        <option value="Palestinian Territory, Occupied">Palestinian Territory, Occupied</option>
+                                        <option value="Panama">Panama</option>
+                                        <option value="Papua New Guinea">Papua New Guinea</option>
+                                        <option value="Paraguay">Paraguay</option>
+                                        <option value="Peru">Peru</option>
+                                        <option value="Philippines">Philippines</option>
+                                        <option value="Pitcairn">Pitcairn</option>
+                                        <option value="Poland">Poland</option>
+                                        <option value="Portugal">Portugal</option>
+                                        <option value="Puerto Rico">Puerto Rico</option>
+                                        <option value="Qatar">Qatar</option>
+                                        <option value="Reunion">Reunion</option>
+                                        <option value="Romania">Romania</option>
+                                        <option value="Russian Federation">Russian Federation</option>
+                                        <option value="Rwanda">Rwanda</option>
+                                        <option value="Saint Helena">Saint Helena</option>
+                                        <option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
+                                        <option value="Saint Lucia">Saint Lucia</option>
+                                        <option value="Saint Pierre and Miquelon">Saint Pierre and Miquelon</option>
+                                        <option value="Saint Vincent and The Grenadines">Saint Vincent and The Grenadines</option>
+                                        <option value="Samoa">Samoa</option>
+                                        <option value="San Marino">San Marino</option>
+                                        <option value="Sao Tome and Principe">Sao Tome and Principe</option>
+                                        <option value="Saudi Arabia">Saudi Arabia</option>
+                                        <option value="Senegal">Senegal</option>
+                                        <option value="Serbia">Serbia</option>
+                                        <option value="Seychelles">Seychelles</option>
+                                        <option value="Sierra Leone">Sierra Leone</option>
+                                        <option value="Singapore">Singapore</option>
+                                        <option value="Slovakia">Slovakia</option>
+                                        <option value="Slovenia">Slovenia</option>
+                                        <option value="Solomon Islands">Solomon Islands</option>
+                                        <option value="Somalia">Somalia</option>
+                                        <option value="South Africa">South Africa</option>
+                                        <option value="South Georgia and The South Sandwich Islands">South Georgia and The South Sandwich Islands</option>
+                                        <option value="Spain">Spain</option>
+                                        <option value="Sri Lanka">Sri Lanka</option>
+                                        <option value="Sudan">Sudan</option>
+                                        <option value="Suriname">Suriname</option>
+                                        <option value="Svalbard and Jan Mayen">Svalbard and Jan Mayen</option>
+                                        <option value="Swaziland">Swaziland</option>
+                                        <option value="Sweden">Sweden</option>
+                                        <option value="Switzerland">Switzerland</option>
+                                        <option value="Syrian Arab Republic">Syrian Arab Republic</option>
+                                        <option value="Taiwan, Province of China">Taiwan, Province of China</option>
+                                        <option value="Tajikistan">Tajikistan</option>
+                                        <option value="Tanzania, United Republic of">Tanzania, United Republic of</option>
+                                        <option value="Thailand">Thailand</option>
+                                        <option value="Timor-leste">Timor-leste</option>
+                                        <option value="Togo">Togo</option>
+                                        <option value="Tokelau">Tokelau</option>
+                                        <option value="Tonga">Tonga</option>
+                                        <option value="Trinidad and Tobago">Trinidad and Tobago</option>
+                                        <option value="Tunisia">Tunisia</option>
+                                        <option value="Turkey">Turkey</option>
+                                        <option value="Turkmenistan">Turkmenistan</option>
+                                        <option value="Turks and Caicos Islands">Turks and Caicos Islands</option>
+                                        <option value="Tuvalu">Tuvalu</option>
+                                        <option value="Uganda">Uganda</option>
+                                        <option value="Ukraine">Ukraine</option>
+                                        <option value="United Arab Emirates">United Arab Emirates</option>
+                                        <option value="United Kingdom">United Kingdom</option>
+                                        <option value="United States">United States</option>
+                                        <option value="United States Minor Outlying Islands">United States Minor Outlying Islands</option>
+                                        <option value="Uruguay">Uruguay</option>
+                                        <option value="Uzbekistan">Uzbekistan</option>
+                                        <option value="Vanuatu">Vanuatu</option>
+                                        <option value="Venezuela">Venezuela</option>
+                                        <option value="Viet Nam">Viet Nam</option>
+                                        <option value="Virgin Islands, British">Virgin Islands, British</option>
+                                        <option value="Virgin Islands, U.S.">Virgin Islands, U.S.</option>
+                                        <option value="Wallis and Futuna">Wallis and Futuna</option>
+                                        <option value="Western Sahara">Western Sahara</option>
+                                        <option value="Yemen">Yemen</option>
+                                        <option value="Zambia">Zambia</option>
+                                        <option value="Zimbabwe">Zimbabwe</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <br/>
+                    {% if free_basket %}
+                        <p>{{ language.translations.agree_to_terms }} <a href="" data-toggle="modal"
+                                                                         data-target="#termsAndConditions">{{ language.translations.terms_and_conditions }}</a>
+                        </p>
+                        <input type="hidden" name="purchase" value="purchase"/>
+                        <input type="hidden" name="webstore" value="{{ webstore.id }}"/>
+                        <input type="hidden" name="payment_method" value="free">
+                        {% csrf_token %}
+                        <button id="free-claim"
+                                data-loading-text="<i class='fa fa-spinner fa-spin '></i> Processing Order"
+                                class="btn btn-success btn-block" type="submit">Claim for free <i
+                                class="fa fa-arrow-right"></i></button>
+                    {% else %}
+                        {% if gateways_not_setup %}
+                            <p style="padding-top: 0px; margin-top:0px;">No gateways have been setup for this store.
+                                Payments cannot be made until at least one gateway has been setup. Please set it up in
+                                the Admin control panel.</p>
+                        {% else %}
+                            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted">{{ language.translations.choose_payment_method }}</span>
+                            </h4>
+                            <div class="row">
+                                {# Payment Options #}
+                                {% if not free_basket %}
+                                    {# If the payment is a subscription then use PayPal #}
+                                    {% if is_subscription %}
+                                        {% if paypal_gateway %}
+                                            <div class="col-md-6">
+                                                <div class="payment-method">
+                                                    <input class="form-check-input" type="radio" name="payment_method"
+                                                           id="paypal_gateway" value="paypal_gateway">
+                                                    <label class="form-check-label" for="paypal_gateway">
+                                                        <img src="/static/control_panel_images/PayPal.svg.png"
+                                                             class="payment-method-image" width="50%"/>
+                                                    </label>
+                                                    {% if paypal_gateway.price_offset != 'N' %}
+                                                        <div class="float-right">
+                                                            {% get_gateway_offset paypal_gateway cart_total as offset %}
+                                                            {% get_price_using_currency offset webstore %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <br/>
+                                        {% endif %}
+                                    {% else %}
+                                        {# If its not a PayPal subscription use other methods #}
+                                        {% if paypal_gateway %}
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="payment_method"
+                                                           id="paypal_gateway" value="paypal_gateway">
+                                                    <label class="form-check-label" for="paypal_gateway">
+                                                        <strong>PayPal</strong>
+                                                    </label>
+                                                    {% if paypal_gateway.price_offset != 'N' %}
+                                                        <div class="float-right">
+                                                            {% get_gateway_offset paypal_gateway cart_total as offset %}
+                                                            {% get_price_using_currency offset webstore %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <br/>
+                                        {% endif %}
+                                        {% if stripe_gateway %}
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="payment_method"
+                                                           id="stripe_gateway" value="stripe_gateway">
+                                                    <label class="form-check-label" for="stripe_gateway">
+                                                        <strong>Stripe</strong>
+                                                    </label>
+                                                    {% if stripe_gateway.price_offset != 'N' %}
+                                                        <div class="float-right">
+                                                            {% get_gateway_offset stripe_gateway cart_total as offset %}
+                                                            {% get_price_using_currency offset webstore %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <br/>
+                                        {% endif %}
+                                        <br/>
+                                        {% if xsolla_gateway %}
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="payment_method"
+                                                           id="xsolla_gateway" value="xsolla_gateway">
+                                                    <label class="form-check-label" for="xsolla_gateway">
+                                                        <strong>Xsolla</strong>
+                                                    </label>
+                                                    {% if xsolla_gateway.price_offset != 'N' %}
+                                                        <div class="float-right">
+                                                            {% get_gateway_offset xsolla_gateway cart_total as offset %}
+                                                            {% get_price_using_currency offset webstore %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <br/>
+                                        {% endif %}
+                                        {% if paygol_gateway %}
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="payment_method"
+                                                           id="paygol_gateway" value="paygol_gateway">
+                                                    <label class="form-check-label" for="paygol_gateway">
+                                                        <strong>Paygol</strong>
+                                                    </label>
+                                                    {% if paygol_gateway.price_offset != 'N' %}
+                                                        <div class="float-right">
+                                                            {% get_gateway_offset paygol_gateway cart_total as offset %}
+                                                            {% get_price_using_currency offset webstore %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <br/>
+                                        {% endif %}
+                                        {% if mollie_gateway %}
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="payment_method"
+                                                           id="mollie_gateway" value="mollie_gateway">
+                                                    <label class="form-check-label" for="mollie_gateway">
+                                                        <strong>Mollie</strong>
+                                                    </label>
+                                                    {% if mollie_gateway.price_offset != 'N' %}
+                                                        <div class="float-right">
+                                                            {% get_gateway_offset mollie_gateway cart_total as offset %}
+                                                            {% get_price_using_currency offset webstore %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <br/>
+                                        {% endif %}
+                                        <br/>
+                                        {% if paymentwall_gateway %}
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="payment_method"
+                                                           id="paymentwall_gateway" value="paymentwall_gateway">
+                                                    <label class="form-check-label" for="paymentwall_gateway">
+                                                        <strong>Paymentwall</strong>
+                                                    </label>
+                                                    {% if paymentwall_gateway.price_offset != 'N' %}
+                                                        <div class="float-right">
+                                                            {% get_gateway_offset paymentwall_gateway cart_total as offset %}
+                                                            {% get_price_using_currency offset webstore %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                    </div>
+                                    <div class="stripe" id="stripe_selected" style="display: none;">
+                                        <input type="hidden" id="webstore-id" value="{{ webstore.id }}">
+                                        <input type="hidden" id="stripe-client-secret">
+                                        <div id="card-element">
+                                            <!-- Elements will create input elements here -->
+                                        </div>
+
+                                        <!-- We'll put the error messages in this element -->
+                                        <div id="card-errors" role="alert"></div>
+                                    </div>
+                                    <style>
+                                        /**
+                                         * The CSS shown here will not be introduced in the Quickstart guide, but shows
+                                         * how you can use CSS to style your Element's container.
+                                         */
+                                        .StripeElement {
+                                            background-color: white;
+                                            height: 40px;
+                                            width: 100%;
+                                            padding: 10px 12px;
+                                            border-radius: 4px;
+                                            border: 1px solid transparent;
+                                            box-shadow: 0 1px 3px 0 #e6ebf1;
+                                            -webkit-transition: box-shadow 150ms ease;
+                                            transition: box-shadow 150ms ease;
+                                        }
+
+                                        .StripeElement--focus {
+                                            box-shadow: 0 1px 3px 0 #cfd7df;
+                                        }
+
+                                        .StripeElement--invalid {
+                                            border-color: #fa755a;
+                                        }
+
+                                        .StripeElement--webkit-autofill {
+                                            background-color: #fefde5 !important;
+                                        }
+                                    </style>
+                                    {% csrf_token %}
+                                    <br/>
+                                    <p>{{ language.translations.agree_to_terms }} <a href="" data-toggle="modal"
+                                                                                     data-target="#termsAndConditions">{{ language.translations.terms_and_conditions }}</a> {{ language.translations.and_our }}
+                                        <a href="" data-toggle="modal"
+                                           data-target="#privacyPolicy">{{ language.translations.privacy_policy }}</a>
+                                    </p>
+                                    <input type="hidden" name="purchase" value="purchase"/>
+                                    <input type="hidden" name="webstore" value="{{ webstore.id }}"/>
+                                    {% csrf_token %}
+                                    <button id="purchase" class="btn btn-success btn-block" type="submit" disabled>
+                                        {% if is_subscription %}Subscribe{% else %}
+                                            {{ language.translations.purchase }}{% endif %} <i
+                                            class="fa fa-arrow-right"></i></button>
+                                    </form>
+                                {% else %}
+                                    <input type="hidden" name="payment_method" value="free">
+                                {% endif %}
+                        {% endif %}
+                    {% endif %}
+
+                <!-- Terms and Conditions Modal -->
+                <div class="modal fade" id="termsAndConditions" tabindex="-1" role="dialog"
+                     aria-labelledby="termsAndConditionsLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title"
+                                    id="termsAndConditionsLabel">{{ language.translations.terms_and_conditions }}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                {{ webstore.terms_and_conditions|safe }}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Policy Modal -->
+                <div class="modal fade" id="privacyPolicy" tabindex="-1" role="dialog"
+                     aria-labelledby="privacyPolicyLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title"
+                                    id="privacyPolicyLabel">{{ language.translations.privacy_policy }}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                {{ webstore.privacy_policy|safe }}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">{{ language.translations.your_cart }}</span>
+                </h4>
+                <ul class="list-group mb-3">
+                    {% for cart_item in cart_items %}
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <h6 class="my-0">{{ cart_item.package.name }}</h6>
+                                <small class="text-muted">
+                                    {% if cart_item.package.allow_customer_change_price %}
+                                        {% get_price_using_currency cart_item.customers_price webstore %}
+                                        <br/>
+                                        <i>{{ language.translations.your_chosen_price }}</i>
+                                    {% else %}
+                                        {% get_price_using_currency cart_item.package.price webstore %}
+                                    {% endif %}
+                                    {% if cart_item.gift %}
+                                        -
+                                        <strong><i class="fa fa-gift"
+                                                   aria-hidden="true"></i> {{ language.translations.this_is_a_gift }} {{ cart_item.gift }}
+                                        </strong>
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <span class="text-muted">
+                                <div class="row">
+                                    <!-- Update Quantity -->
+                                    <div class="col-md-6 quantity-control-button">
+                                        <form name="update-quantity" action="" method="post">
+                                            <div class="input-group mb-3">
+                                                <input type="number" min="0" value="{{ cart_item.quantity }}"
+                                                       name="quantity" class="form-control"
+                                                        {% if not cart_item.package.allow_customer_change_qty %}
+                                                       disabled {% endif %}>
+                                                <input type="hidden" value="{{ cart_item.package.id }}"
+                                                       name="package_to_update">
+
+                                                <div class="input-group-append">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-outline-secondary"><i
+                                                            class="fa fa-sync-alt"></i></button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <!-- Remove Package -->
+                                    <div class="col-md-3 remove-control-button">
+                                        <form name="remove" method="post" action="">
+                                            <input name="package_to_remove" value="{{ cart_item.package.id }}"
+                                                   type="hidden">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger"><i
+                                                    class="fa fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                    <!-- Info about Package -->
+                                    <div class="col-md-3 info-control-button">
+                                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                                data-target="#package-{{ cart_item.package.id }}">
+                                            <i class="fa fa-info"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </span>
+                            <span class="text-muted">
+                                {% get_price_using_currency cart_item.sub_total webstore %}
+                            </span>
+                        </li>
+                        <!-- Package Info Modal -->
+                        <div class="modal fade" id="package-{{ cart_item.package.id }}" tabindex="-1" role="dialog"
+                             aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">{{ cart_item.package.name }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        {% if cart_item.package.image %}
+                                            <img style='float:left;height:170px; width:170px; margin-right:10px;'
+                                                 src="/{{ cart_item.package.image.url }}"/>
+                                        {% endif %}
+                                        {{ cart_item.package.description|safe }}
+                                        <br/>
+                                        {% if cart_item.variables %}
+                                            <strong>Variables Chosen:</strong>
+                                            <ul class="list-group">
+                                                {% for variable in cart_item.variables %}
+                                                    <li class="list-group-item">
+                                                        <strong>Name:</strong> {{ variable.variable.description }}<br/>
+                                                        <strong>Choice:</strong> {{ variable.choice }}<br/>
+                                                        <strong>Price:</strong> {% get_price_using_currency variable.price webstore %}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <strong>{% get_price_using_currency cart_item.sub_total webstore %}</strong>
+                                        <form name="remove" method="post" action="">
+                                            <input name="package_to_remove" value="{{ cart_item.package.id }}"
+                                                   type="hidden">
+                                            {% csrf_token %}
+                                            <input type="submit" class="btn btn-danger"
+                                                   value="{{ language.translations.remove }}">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    {# List all discounts if they exist #}
+                    {% if request.session.discounts %}
+                        {% for discount in request.session.discounts %}
+
+                            {% if discount.type == 'Coupon' %}
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="text-success">
+                                        <h6 class="my-0"><i class="fa fa-tags"></i> Coupon</h6>
+                                        <small>Code: {{ discount.obj.code }}</small>
+                                    </div>
+                                    <span class="text-success">
+                                        <small><span class="float-right">
+                                            {% if discount.obj.discount_type == 'A' %}
+                                                <strong>{{ language.translations.discount }}:</strong>
+                                                {{ discount.obj.discount_value }} {{ webstore.currency }}
+                                            {% elif discount.obj.discount_type == 'P' %}
+                                                <strong>{{ language.translations.discount }}:</strong>
+                                                {{ discount.obj.discount_value }}%
+                                            {% endif %}
+                                        </span></small>
+                                    </span>
+                                    <span><a href="/checkout/discounts/remove/{{ discount.obj.id }}"
+                                             class="btn btn-danger"><i class="fa fa-trash"></i></a></span>
+                                </li>
+                            {% endif %}
+                            {% if discount.type == 'GiftCard' %}
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="text-success">
+                                        <h6 class="my-0"><i class="fa fa-gift"></i> Gift Card</h6>
+                                        <small>Code: {{ discount.obj.code }}</small>
+                                    </div>
+                                    <span class="text-success">
+                                        <small><span
+                                                class="float-right"><strong>{{ language.translations.previous_balance }}:</strong> {% get_price_using_currency discount.obj.previous webstore %}</span><br/>
+                                        <span class="float-right"><strong>{{ language.translations.balance_after_transaction }}:</strong> {% get_price_using_currency discount.obj.current webstore %}</span></small>
+                                    </span>
+                                    <span><a href="/checkout/discounts/remove/{{ discount.obj.id }}"
+                                             class="btn btn-danger"><i class="fa fa-trash"></i></a></span>
+                                </li>
+                            {% endif %}
+                            {% if discount.type == 'virtual_currency' %}
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="text-success">
+                                        <h6 class="my-0"><i class="fa fa-dollar-sign"></i> Virtual Currency</h6>
+                                        <small>Currency Code: {{ discount.obj.code }}</small>
+                                    </div>
+                                    <span class="text-success">
+                                        <small><span class="float-left"><strong>Using:</strong></span><br/>
+                                            <span class="float-right">{{ discount.obj.amount }}{{ discount.obj.code }} =
+                                                {{ discount.obj.amount|multiply:discount.obj.real_exchange }}{{ webstore.currency }}</span></small>
+                                    </span>
+                                    <span><a href="/remove-currency" class="btn btn-danger"><i class="fa fa-trash"></i></a></span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if taxes %}
+                        {% for tax in taxes %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ tax.name }} (Tax):</strong><br/>
+                                    <small>{{ language.translations.because_you_reside }} {{ country_name }} {{ language.translations.you_will_be_charged_tax }}</small>
+                                </div>
+
+                                <span>
+                                    {{ tax.percentage }}%
+                                </span>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+
+                    <li class="list-group-item d-flex justify-content-between bg-light">
+                        <span>{{ language.translations.total }} </span>
+                        <strong>{% get_price_using_currency cart_total|floatformat:2 webstore %}</strong>
+                    </li>
+                </ul>
+                <br/>
+                {% if virtual_currencies %}
+                    <div class="float-right">
+                        {% if request.session.active_virtual_currencies %}
+                            <a href="/remove-currency" class="btn btn-sm btn-danger">{{ language.translations.remove_virtual_currencies }}</a>
+                        {% else %}
+                            <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+                                    data-target="#payWithVirtualCurrency">
+                                {{ language.translations.want_to_pay_virtual_currency }}
+                            </button>
+                        {% endif %}
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="payWithVirtualCurrency" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title"
+                                        id="exampleModalLabel">{{ language.translations.pay_with_virtual_currencies }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="card" style="margin-bottom: 5px;">
+                                        <div class="card-body bg-danger">
+                                            <h1 class="text-white">{{ language.translations.step_1 }}</h1>
+                                            <span class="text-white">{{ language.translations.virtual_currency_step_1 }}
+
+                                                    <br/>
+                                                    /donationstore getcurrencycode</span>
+                                        </div>
+                                    </div>
+                                    <div class="card" style="margin-top: 5px; margin-bottom: 5px;">
+                                        <div class="card-body bg-warning">
+                                            <h1 class="text-white">{{ language.translations.step_2 }}</h1>
+                                            <span class="text-white">{{ language.translations.virtual_currency_step_2 }}
+                                                <br/></span>
+                                        </div>
+                                    </div>
+                                    <div class="card" style="margin-top: 5px;">
+                                        <div class="card-body bg-success">
+                                            <h1 class="text-white">{{ language.translations.step_3 }}</h1>
+                                            <span class="text-white">{{ language.translations.virtual_currency_step_3 }}
+                                                <br/></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">{{ language.translations.close }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if recommended_packages_setup and recommended_packages %}
+                    <h4 class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">{{ recommended_packages_setup.title }}</span>
+                    </h4>
+                    <ul class="list-group">
+                        {% for recommended_package in recommended_packages %}
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        {{ recommended_package.package.name }}
+                                        {% if not recommended_package.package.allow_customer_change_price %}
+                                            {% check_for_sale recommended_package.package.id webstore.id as package_on_sale %}
+                                            {% if package_on_sale.is_on_sale %}
+                                                {% if 'allow_customer_to_change_price' in package_on_sale %}
+                                                    {{ language.translations.you_decide_how_much }}
+                                                {% else %}
+                                                    <span class="text-danger"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
+                                                    <span class="text-success">{% get_price_using_currency package_on_sale.sale_price webstore %}</span>
+                                                {% endif %}
+                                            {% else %}
+                                                {% get_price_using_currency recommended_package.package.price webstore %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {% if recommended_package.offer_discount %}
+                                            <span class="text-success">
+                                            <strong>
+                                            {% if recommended_package.discount_type == 'amount' %}
+                                                {% get_price_using_currency recommended_package.discount_amount webstore %}
+                                                off
+                                            {% elif recommended_package.discount_type == 'percentage' %}
+                                                {{ recommended_package.discount_percentage }}% off
+                                            {% endif %}
+                                            </strong><br/>
+                                            <small>{{ recommended_packages_setup.discount_message }}</small>
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="float-right">
+                                            <button type="button" class="btn btn-secondary btn-block"
+                                                    data-toggle="modal"
+                                                    data-target="#package-{{ recommended_package.package.id }}">
+                                                <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
+                                            </button>
+                                        </div>
+                                    </div>
+                            </li>
+                            <div class="modal fade" id="package-{{ recommended_package.package.id }}" tabindex="-1"
+                                 role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title"
+                                                id="exampleModalLabel">{{ recommended_package.package.name }}</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            {% if recommended_package.package.image %}
+                                                <img style='float:left;height:170px; width:170px; margin-right:10px;'
+                                                     src="/{{ recommended_package.package.image.url }}"
+                                                     alt="recommended-package-image"/>
+                                            {% endif %}
+                                            {{ recommended_package.package.description|safe }}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <strong>
+                                                Discount Applied at Checkout
+                                            </strong>
+                                            <form name="add-to-cart" method="post"
+                                                  action="/category/{{ recommended_package.package.category.id }}">
+                                                <input name="package_id" value="{{ recommended_package.package.id }}"
+                                                       type="hidden">
+                                                <input name="recommended-package-id"
+                                                       value="{{ recommended_package.id }}" type="hidden">
+                                                {% csrf_token %}
+                                                {% get_add_to_cart_buttons language package_payments recommended_package.package webstore as cart_button %}
+                                                {% if cart_button.is_allowed_to_purchase %}
+                                                    {% if recommended_package.package.purchase_type == 'O' %}
+                                                        <input type="submit" name="add_to_cart" class="btn btn-primary"
+                                                               value="{{ language.translations.add_to_cart }}">
+                                                    {% elif recommended_package.package.purchase_type == 'S' %}
+                                                        <input type="submit" name="add_to_cart" class="btn btn-primary"
+                                                               value="{{ language.translations.add_to_cart }}">
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="d-inline-block" tabindex="0" data-toggle="tooltip"
+                                                          title="{{ cart_button.reason }}">
+                                                    {% if recommended_package.package.purchase_type == 'O' %}
+                                                        <input type="submit" name="add_to_cart" class="btn btn-primary"
+                                                               value="{{ language.translations.add_to_cart }}">
+                                                    {% elif recommended_package.package.purchase_type == 'S' %}
+                                                        <input type="submit" name="add_to_cart" class="btn btn-primary"
+                                                               value="{{ language.translations.add_to_cart }}">
+                                                    {% endif %}
+                                                </span>
+                                                {% endif %}
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </ul>
+                    <br/>
+                {% endif %}
+
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">{{ language.translations.have_coupon_gift_card }}</span>
+                </h4>
+                <form name="redeem-coupon" action="" method="post">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="{{ language.translations.enter_code }}"
+                               name="discount_code">
+                        <input type="hidden" name="total" value="{{ cart_total }}">
+                        <div class="input-group-append">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary">{{ language.translations.redeem }}</button>
+                        </div>
+                    </div>
+                </form>
+
+                {% if request.session.virtual_currencies and not request.session.active_virtual_currencies %}
+                    <br/><br/>
+                    <div class="virtual-currencies">
+                    <h4 class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">{{ language.translations.user_virtual_currencies }}</span>
+                    </h4>
+                    <form name="apply_currencies" action="" method="post">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th style="width: 20%">Currency</th>
+                                <th style="width: 20%">Amount</th>
+                                <th style="width: 30%">Use</th>
+                                <th style="width: 30%">{{ webstore.currency }}</th>
+                                <th scope="col">Balance</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for virtual_currency in request.session.virtual_currencies %}
+
+                                <tr>
+                                    <td>{{ virtual_currency.code }}</td>
+                                    <td>{{ virtual_currency.amount }}</td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="hidden" name="virtual_currency_code"
+                                                   value="{{ virtual_currency.code }}">
+                                            <input type="number" id="{{ virtual_currency.code }}Amount"
+                                                   class="form-control" name="virtual_currency_amount"
+                                                   placeholder="Amount to Use">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div id="{{ virtual_currency.code }}Real">0.00</div>
+                                    </td>
+                                    <td>
+                                        <div id="{{ virtual_currency.code }}Balance">{{ virtual_currency.amount }}</div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <script>
+                                window.onload = function () {
+
+                                    {% for virtual_currency in request.session.virtual_currencies %}
+
+                                        var {{ virtual_currency.code }}Total = 0;
+
+                                        document.getElementById("{{ virtual_currency.code }}Amount").addEventListener("input", function () {
+                                            // Let us calculate the value
+                                            var enteredPrice = parseFloat(document.getElementById("{{ virtual_currency.code }}Amount").value);
+
+                                            if (enteredPrice > {{ virtual_currency.amount }}) {
+                                                // Set the input to 0 and reset the balance
+                                                document.getElementById("{{ virtual_currency.code }}Amount").value = 0;
+                                                document.getElementById("{{ virtual_currency.code }}Balance").innerHTML = {{ virtual_currency.amount }};
+                                                alert('Cannot use ' + enteredPrice + '{{ virtual_currency.code }}\'s\ because this exceeds you balance');
+                                            } else if (enteredPrice < 0) {
+                                                document.getElementById("{{ virtual_currency.code }}Amount").value = 0;
+                                                document.getElementById("{{ virtual_currency.code }}Balance").innerHTML = {{ virtual_currency.amount }};
+                                                alert('You cannot use minus amounts.');
+                                            } else if (!document.getElementById("{{ virtual_currency.code }}Amount").value) {
+                                                document.getElementById("{{ virtual_currency.code }}Balance").innerHTML = {{ virtual_currency.amount }};
+                                                document.getElementById('{{ virtual_currency.code }}Discount').innerHTML = "0.00";
+                                                document.getElementById('totalAmount').innerHTML = {{ request.session.cart_total|floatformat:2 }};
+                                                {{ virtual_currency.code }}Total = 0;
+                                            } else {
+                                                // Now that we have how much that they want to use, take it from their balance and replace it above.
+                                                document.getElementById("{{ virtual_currency.code }}Balance").innerHTML = {{ virtual_currency.amount }} -enteredPrice;
+
+                                                // Get the exchange
+                                                document.getElementById("{{ virtual_currency.code }}Real").innerHTML = (1 /{{ virtual_currency.exchange_rate }}) * enteredPrice;
+
+                                            }
+                                        });
+
+
+                                    {% endfor %}
+                                }
+                            </script>
+                        </table>
+                        {% csrf_token %}
+                        <input name="apply_currencies" type="hidden" value="yes">
+                        <button type="submit" class="btn btn-primary btn-sm btn-block">Apply Virtual Currencies</button>
+                    </form>
+                {% endif %}
+
+                <br/>
+                <div class="card">
+                    <div class="card-body">
+                        {% get_user webstore as logged_in_user %}
+                        <div class="float-right"><img
+                                src="https://minotar.net/avatar/{{ logged_in_user.username }}/64"/></div>
+                        <h4>{{ language.translations.buying_as }}:<br/>
+                            {% get_user webstore as logged_in_user %}
+                            <small>{{ logged_in_user.username }}</small></h4>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-danger btn-sm btn-block" data-toggle="modal"
+                                data-target="#changeIGN">
+                            {{ language.translations.change_ign }}
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="changeIGN" tabindex="-1" role="dialog"
+                             aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"
+                                            id="exampleModalLabel">{{ language.translations.change_ign }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        {# If an Online webstore #}
+                                        <form name="change_ign" method="post" action="/login?next=/checkout">
+                                            <div class="form-group">
+                                                <input class="form-control form-control-lg" type="text" name="username"
+                                                       placeholder="{{ language.translations.your_minecraft_ign }}"
+                                                       required>
+                                            </div>
+                                            <button type="submit"
+                                                    class="btn btn-block btn-primary"> {{ language.translations.change_ign }}</button>
+                                            {% csrf_token %}
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                </div>
+            </div>
+
+        </div>
+
+        {% include 'store/default/footer.html' %}
+
+{% endblock %}

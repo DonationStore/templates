@@ -1,0 +1,76 @@
+{% extends "store/default/base.html" %}
+
+{% block title %}{{ webstore.name }} | {{ page.title }}{% endblock %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load modules %}
+
+{% load currency %}
+
+{% block content %}
+
+    {% include 'store/default/nav.html' %}
+
+    <!-- Break -->
+    <br/>
+
+    <!-- Main Login Content -->
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            {% if page.layout == 'L' %}
+                <div class="col-md-4">
+                {% for module in page.column1.all %}
+                    {% include module|template %}
+                {% endfor %}
+                </div>
+                <div class="col-md-8">
+                {% for module in page.column3.all %}
+                    {% include module|template %}
+                {% endfor %}
+                </div>
+            {% elif page.layout == 'R' %}
+                <div class="col-md-8">
+                {% for module in page.column1.all %}
+                    {% include module|template %}
+                {% endfor %}
+                </div>
+                <div class="col-md-4">
+                {% for module in page.column3.all %}
+                    {% include module|template %}
+                {% endfor %}
+                </div>
+            {% else %}
+                <div class="col-md-4">
+                {% for module in page.column1.all %}
+                    {% include module|template %}
+                {% endfor %}
+                </div>
+                <div class="col-md-4">
+                {% for module in page.column2.all %}
+                    {% include module|template %}
+                {% endfor %}
+                </div>
+                <div class="col-md-4">
+                {% for module in page.column3.all %}
+                    {% include module|template %}
+                {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+    <!-- End Main Login Content -->
+
+    {% include 'store/default/footer.html' %}
+
+{% endblock %}

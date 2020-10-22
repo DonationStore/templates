@@ -1,0 +1,215 @@
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load currency %}
+
+<!-- Login/Top Nav -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="navbarNavDropdown" class="navbar-collapse collapse">
+        <ul class="navbar-nav mr-auto">
+            {% if webstore.support_tickets %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/support">{{ language.translations.need_support }}</a>
+                </li>
+            {% endif %}
+        </ul>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                {% is_logged_in webstore as logged_in %}
+                {% if logged_in %}
+                    {% get_user webstore as logged_in_user %}
+                    <a class="logged-in-link" data-toggle="tooltip" data-placement="bottom" title="Click to Logout" href="/logout">
+                        {{ language.translations.logged_in_as_minecraft_user }} {{ logged_in_user.username }}
+                        &nbsp;
+                        <img src="https://minotar.net/avatar/{{ logged_in_user.username }}/32" style="border-radius: 2px;" alt="User Logged In">
+                    </a>
+                {% else %}
+                    {{ language.translations.not_logged_in }}
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Break -->
+
+
+<!-- If Advertised Sale on Everything -->
+{% if sales_data.everything_on_sale %}
+    <div class="alert alert-success" role="alert">
+        {{ language.translations.sale_on_everything }}
+    </div>
+{% endif %}
+<!-- End If Advertised Sale on Everything -->
+
+
+<!-- Break -->
+
+
+<!-- Store Name, Currency and Basket -->
+<div class="top-nav" style="background-image: url('/{{ webstore.home_banner }}');">
+    <div class="container">
+        <div class="float-right">
+            <!-- Logout Button if the user is logged in -->
+            {% is_logged_in webstore as logged_in %}
+            {% if logged_in %}
+                <a href="/logout" class="btn btn-danger"><i class="fa fa-sign-out-alt"></i> Logout</a>
+            {% endif %}
+
+            <!-- All available currencies for the user to choose from -->
+            <div class="btn-group dropdown">
+                <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-money-bill-alt"></i> {% if request.session.chosen_currency %} {{ request.session.chosen_currency }}{% else %}{{ webstore.currency }}{% endif %}
+                </button>
+                <div class="dropdown-menu" style="width: 10px">
+                    <a class="dropdown-item" href="/currency/AUD?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'AUD' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}AUD</a>
+                    <a class="dropdown-item" href="/currency/BRL?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'BRL' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}BRL</a>
+                    <a class="dropdown-item" href="/currency/CAD?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'CAD' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}CAD</a>
+                    <a class="dropdown-item" href="/currency/CHF?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'CHF' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}CHF</a>
+                    <a class="dropdown-item" href="/currency/CNY?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'CNY' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}CNY</a>
+                    <a class="dropdown-item" href="/currency/CZK?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'CZK' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}CZK</a>
+                    <a class="dropdown-item" href="/currency/DKK?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'DKK' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}DKK</a>
+                    <a class="dropdown-item" href="/currency/EUR?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'EUR' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}EUR</a>
+                    <a class="dropdown-item" href="/currency/GBP?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'GBP' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}GBP</a>
+                    <a class="dropdown-item" href="/currency/HKD?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'HKD' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}HKD</a>
+                    <a class="dropdown-item" href="/currency/HUF?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'HUF' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}HUF</a>
+                    <a class="dropdown-item" href="/currency/ILS?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'ILS' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}ILS</a>
+                    <a class="dropdown-item" href="/currency/JPY?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'JPY' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}JPY</a>
+                    <a class="dropdown-item" href="/currency/MXN?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'MXN' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}MXN</a>
+                    <a class="dropdown-item" href="/currency/MYR?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'MYR' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}MYR</a>
+                    <a class="dropdown-item" href="/currency/NOK?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'NOK' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}NOK</a>
+                    <a class="dropdown-item" href="/currency/NZD?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'NZD' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}NZD</a>
+                    <a class="dropdown-item" href="/currency/PHP?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'PHP' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}PHP</a>
+                    <a class="dropdown-item" href="/currency/PLN?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'PLN' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}PLN</a>
+                    <a class="dropdown-item" href="/currency/RUB?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'RUB' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}RUB</a>
+                    <a class="dropdown-item" href="/currency/SEK?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'SEK' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}SEK</a>
+                    <a class="dropdown-item" href="/currency/SGD?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'SGD' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}SGD</a>
+                    <a class="dropdown-item" href="/currency/THB?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'THB' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}THB</a>
+                    <a class="dropdown-item" href="/currency/TRY?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'TRY' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}TRY</a>
+                    <a class="dropdown-item" href="/currency/USD?next={% firstof request.path '/' %}">{% if request.session.chosen_currency == 'USD' %}<div class="float-right"><i class="fa fa-check"></i></div>{% endif %}USD</a>
+                </div>
+            </div>
+            {# Check to see if there are items in the cart #}
+            {% if cart %}
+                <a href="/checkout" class="btn btn-primary">
+                    <i class="fa fa-shopping-cart"></i> {{ cart|length }} {{ language.translations.items_for }} {% get_price_using_currency cart_total|floatformat:2 webstore %}
+                </a>
+            {% else %}
+                <button class="btn btn-primary"><i class="fa fa-shopping-cart"></i> {{ language.translations.no_items_in_cart }}</button>
+            {% endif %}
+        </div>
+        {% if webstore.logo %}
+            <a href="/"><img src="/{{ webstore.logo }}" height="60"/></a>
+        {% else %}
+            <img src="/static/assets/images/logo.png" width="300"><br/>
+            This logo has not been set yet. Set it in your control panel.
+        {% endif %}
+    </div>
+</div>
+<!-- End Store Name, Currency and Basket -->
+
+
+<!-- Break -->
+
+
+<!-- Main Nav with Categories -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark main-nav">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="container">
+        <div class="collapse navbar-collapse" id="navbarColor03">
+            <ul class="navbar-nav mr-auto">
+                <li class="navbar-item">
+                    <a class="nav-link" href="/">{{ language.translations.home }}</a>
+                </li>
+
+                {% for category in category_tree %}
+                    {% if category.sub_categories %}
+                        {# Now that we know there are subcategories, make a dropdown. #}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ category.parent.name }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                {# Put the top parent category in here so it's clickable #}
+                                {% if category.parent.do_not_display_in_subcategory_dropdown is False %}
+                                    <a class="dropdown-item" href="/category/{% if category.parent.slug %}{{ category.parent.slug }}{% else %}{{ category.parent.id }}{% endif %}">
+                                        {{ category.parent.name }}
+                                        {% if sales_data.categories_on_sale %}
+                                            {% for category_sale in sales_data.categories_on_sale %}
+                                                {% if category.parent.id == category_sale.category_id %}
+                                                    <span class="badge badge-success">On Sale</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if category.parent.id in sales_data.categories_on_sale.category_id %}
+                                                <span class="badge badge-success">On Sale</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </a>
+                                {% endif %}
+
+                                {% for sub_category in category.sub_categories %}
+                                    {% if sub_category.do_not_display_in_subcategory_dropdown is False %}
+                                        <a class="dropdown-item" href="/category/{% if sub_category.slug %}{{ sub_category.slug }}{% else %}{{ sub_category.id }}{% endif %}">
+                                            {{ sub_category.name }}
+                                            {% if sales_data.categories_on_sale %}
+                                                {% for category_sale in sales_data.categories_on_sale %}
+                                                    {% if sub_category.id == category_sale.category_id %}
+                                                        <span class="badge badge-success">On Sale</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% if sub_category.id in sales_data.categories_on_sale.category_id %}
+                                                    <span class="badge badge-success">On Sale</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </li>
+                    {% else %}
+                        {# If not just list the category as normal #}
+                        <li class="navbar-item">
+                            <a class="nav-link" href="/category/{% if category.parent.slug %}{{ category.parent.slug }}{% else %}{{ category.parent.id }}{% endif %}">{{ category.parent.name }}
+                                {% if sales_data.categories_on_sale %}
+                                    {% for category_sale in sales_data.categories_on_sale %}
+                                        {% if category.parent.id == category_sale.category_id %}
+                                            <span class="badge badge-success">On Sale</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if category.id in sales_data.categories_on_sale.category_id %}
+                                        <span class="badge badge-success">On Sale</span>
+                                    {% endif %}
+                                {% endif %}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+
+                {% for page in pages %}
+                    {% if page.status and page.add_to_menu %}
+                        {% if page.logged_in_to_view %}
+                            {% if request.session.logged_in %}
+                                <li class="navbar-item">
+                                    <a class="nav-link" href="/{{ page.url }}">{{ page.title }}</a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="navbar-item">
+                                <a class="nav-link" href="/{{ page.url }}">{{ page.title }}</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- Main Top Nav with Categories -->

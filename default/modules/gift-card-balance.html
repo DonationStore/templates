@@ -1,0 +1,27 @@
+{% load cart %}
+
+{% load modules %}
+
+{% gift_card_balance_module module as gift_card_balance %}
+    <div class="card">
+        <div class="card-header">
+            {{ module.header }}
+        </div>
+        <div class="card-body">
+        <form name="check_gift_card_balance" action='' method="post">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="{{ language.translations.gift_card_number }}" name="gift_card_number">
+                {% csrf_token %}
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">{{ language.translations.check }}<i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </form>
+        {% if gift_card %}
+            <hr/>
+            <strong>{{ language.translations.starting_balance }}</strong><div class="float-right">{{ webstore.currency }}{{ gift_card.start_balance }}</div><br/>
+            <strong>{{ language.translations.current_balance }}</strong><div class="float-right">{{ webstore.currency }}{{ gift_card.current_balance }}</div>
+        {% endif %}
+        </div>
+    </div>
+<br/>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    {% load static %}
+    {% load currency %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" href="/static/default/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/default/css/default.css">
+
+    <link rel="icon" href="https://donationstore.net/static/images/favicon.ico">
+
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <script src="https://js.stripe.com/v3/"></script>
+
+</head>
+<body>
+{% block content %}{% endblock content %}
+{% if stripe_gateway %}
+    <script>
+        // Create a Stripe client.
+        var stripe = Stripe('{{ stripe_gateway.publishable_key }}');
+
+        // Create an instance of Elements.
+        var elements = stripe.elements();
+
+        // Custom styling can be passed to options when creating an Element.
+        // (Note that this demo uses a wider set of styles than the guide below.)
+        var style = {
+            base: {
+                color: '#32325d',
+                lineHeight: '18px',
+                fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                fontSmoothing: 'antialiased',
+                fontSize: '16px',
+                '::placeholder': {
+                    color: '#aab7c4'
+                }
+            },
+            invalid: {
+                color: '#fa755a',
+                iconColor: '#fa755a'
+            }
+        };
+
+        // Create an instance of the card Element.
+        var card = elements.create('card', {hidePostalCode: true, style: style});
+
+        // Add an instance of the card Element into the `card-element` <div>.
+        card.mount('#card-element');
+
+        // Handle real-time validation errors from the card Element.
+        card.addEventListener('change', function(event) {
+            var displayError = document.getElementById('card-errors');
+
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+
+        // Handle form submission.
+        var form = document.getElementById('purchase_form');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Get the payment_selection by id because it'll be needed to bypass error messages if stripe is not chosen
+            var payment_methods = document.getElementsByName('payment_method');
+            var selected_method = null;
+
+            for(var i=0; i<payment_methods.length; i++) {
+                if(payment_methods[i].checked) {
+                    selected_method = payment_methods[i].value;
+                }
+            }
+
+            if (selected_method === 'stripe_gateway') {
+                stripe.confirmCardPayment(document.getElementById('stripe-client-secret').value, {
+                    payment_method: {
+                        card: card,
+                        billing_details: {
+                            name: document.getElementById('first_name').value + ' ' + document.getElementById('last_name').value,
+                            email: document.getElementById('email').value,
+                            address: {
+                                line1: document.getElementById('address_line_1').value,
+                                line2: document.getElementById('address_line_2').value,
+                                city: document.getElementById('city').value
+                            }
+                        }
+                    }
+                }).then(function(result) {
+                    if (result.error) {
+                        console.log(result.error.message);
+                    } else {
+                        if (result.paymentIntent.status === 'succeeded') {
+                            window.location.replace('/payment-complete');
+                        }
+                    }
+                })
+            } else {
+                var form = document.getElementById('purchase_form');
+                form.submit();
+            }
+        });
+    </script>
+{% endif %}
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="/static/assets/js/store.js"></script>
+<script src="/static/default/js/bootstrap.min.js"></script>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    {% for virtual_currency in request.session.virtual_currencies %}
+        $('#{{ virtual_currency.code }}Amount').bind('keyup change', function() {
+            var amount = $(this).val() / {{ virtual_currency.exchange_rate }};
+            $('#{{ virtual_currency.code }}Real').html(amount);
+        });
+    {% endfor %}
+</script>
+</html>

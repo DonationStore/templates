@@ -1,0 +1,34 @@
+{% load cart %}
+
+{% load modules %}
+
+{% top_customers_module module as top_customer %}
+ <div class="card">
+    <div class="card-header">
+        {{ module.header }}
+    </div>
+    <div class="card-body">
+        {% if top_customer.customer %}
+        <div class="row">
+            <div class="col-md-2">
+                <img src="https://minotar.net/avatar/{{ top_customer.customer.username }}/45" alt="top-customer">
+            </div>
+            <div class="col-md-10">
+                <div style="font-size: 15px">
+                    <strong>{{ top_customer.customer.username }}</strong>
+                    <br/>
+                    <div style="margin-top:0px">
+                        {% if top_customer.module.display_amount %}
+                            {{ webstore.currency }}{{ top_customer.customer.payment__amount__sum }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+            No customer for that period.
+        {% endif %}
+    </div>
+</div>
+<br/>
+
