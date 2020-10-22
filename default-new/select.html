@@ -1,0 +1,121 @@
+{% extends 'store/default-new/base.html' %}
+
+{% block title %}{{ webstore.name }} | Select{% endblock %}
+
+{% block content %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load modules %}
+
+{% load currency %}
+
+    {% include 'store/default-new/top-nav.html' %}
+
+    <div class="{% if webstore_config.vertical_nav %}flex{% endif %}">
+        {% include 'store/default-new/nav.html' %}
+
+        <div class="{% if webstore_config.vertical_nav %}w-4/5 pl-3{% endif %}">
+
+            <div class="{% if not webstore_config.vertical_nav %}flex{% endif %}">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} mr-4 mt-0 ml-2">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="{% if webstore_config.vertical_nav %}w-full flex{% else %}w-1/4 order-last{% endif %}">
+                    {% for module in modules %}
+                        {% if module.on_homepage %}
+                            {% include module|template %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="{% if webstore_config.vertical_nav %}w-full{% else %}w-3/4 pr-3{% endif %}">
+                    <div class="card mt-0 mr-0">
+                        <div class="card-header">
+                            <h3>{{ package_obj.name }}</h3>
+                        </div>
+                        <div class="card-body mt-2">
+                            <p>{{ language.translations.need_details }}</p>
+
+                            <form name="option-form" action="" method="post" class="mt-2">
+                                {% if request.session.require_discord_login %}
+                                    {% if webstore.discord_client_id and webstore.discord_client_secret %}
+                                        {% is_logged_in_to_discord webstore as discord_user %}
+                                        {% if discord_user %}
+                                            <div class="float-right mt-2">
+                                                <a href="https://discord.com/api/oauth2/authorize?client_id={{ webstore.discord_client_id }}&redirect_uri=https://{{ webstore.sub_domain }}/api/oauth/authorize&response_type=code&scope=identify" class="button button-brand">
+                                                    {{ language.translations.login_as_different_discord_user }}
+                                                </a>
+                                            </div>
+                                            <div class="flex">
+                                                <img src="https://cdn.discordapp.com/avatars/{{ discord_user.id }}/{{ discord_user.avatar }}.png" class="discord-avatar h-12 rounded-md my-auto" alt="Discord Avatar">
+                                                <p class="my-auto text-lg pl-2">{{ language.translations.logged_in_as_discord_user }} {{ discord_user.username }}#{{ discord_user.discriminator }}</p>
+                                            </div>
+                                            <br/>
+                                        {% else %}
+                                            {{ language.translations.package_requires_discord_login }}<br/><br/>
+                                            <a href="https://discord.com/api/oauth2/authorize?client_id={{ webstore.discord_client_id }}&redirect_uri=https://{{ webstore.sub_domain }}/api/oauth/authorize&response_type=code&scope=identify" class="button button-brand">
+                                                {{ language.translations.login_with_discord }}<i class="fab fa-fw fa-discord"></i></a>
+                                            <br/><br/>
+                                        {% endif %}
+                                    {% else %}
+                                        {{ language.translations.cannot_purchase_discord_not_setup }}
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if allow_customer_change_price %}
+                                    <div class="form-group">
+                                        <input type="number" step="0.01" name="customers_price" placeholder="{{ language.translations.please_enter_price }}" class="form-input">
+                                    </div>
+                                {% endif %}
+
+                                {% if choose_server_to_execute %}
+                                    <div class="form-group">
+                                        <label for="server_to_execute">{{ language.translations.server_to_receive }}</label>
+                                        <select class="form-input" id="server_to_execute" name="server_to_execute">
+                                            {% for server in servers %}
+                                                <option value="{{ server.id }}">{{ server.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                {% endif %}
+
+                                {% for variable in variables %}
+                                    {# If alphanumeric #}
+                                    <div class="form-group">
+                                        {% if variable.type == "D" %}
+                                            <strong>{{ variable.description }}</strong>
+                                            <select class="form-input" id="variable" name="variable">
+                                                {% for option in variable.options %}
+                                                    <option value="{{ option.value }}">{{ option.name }} - (+{% get_price_using_currency option.price webstore %})</option>
+                                                {% endfor %}
+                                            </select>
+                                        {% else %}
+                                            <input {% if variable.type == "A" %}type="text"{% elif variable.type == "N" %}type="number"{% elif variable.type == "E" %}type="email"{% else %}type="text"{% endif %}
+                                                   class="form-input" placeholder="{{ variable.description }}" id="{{ variable.identifier }}" name="variable" maxlength="{{ variable.maximum_length }}" required>
+                                        {% endif %}
+                                    </div>
+                                    <input type="hidden" value="{{ variable.id }}" name="variable_id"/>
+                                {% endfor %}
+
+                                <input type="hidden" name="package_id" value="{{ package.id }}"/>
+                                {% csrf_token %}
+
+                                <input type="submit" class="button button-brand cursor-pointer" value="{{ language.translations.continue }}"/>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

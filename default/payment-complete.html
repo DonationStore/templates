@@ -33,10 +33,10 @@
                 {% if webstore.payment_complete_page %}
                     <p>{{ webstore.payment_complete_page|safe }}</p>
                 {% else %}
-                    <p>Thank you for your payment. It may take a few moments for us to receive back a response from the payment gateway you chose. <br/><br/>
-                        To receive your purchase please login to our server and wait, you will be awarded within the next 5 minutes.<br/><br/>
+                    <p>{{ language.translations.payment_complete }} <br/><br/>
+                    {{ language.translations.how_to_receive_commands }}<br/><br/>
 
-                        Thank you for purchasing items with us today.</p>
+                    {{ language.translations.thank_you_for_purchasing }}</p>
                 {% endif %}
             </div>
         </div>

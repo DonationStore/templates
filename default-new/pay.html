@@ -1,0 +1,6 @@
+{% if payment == 'Paymentwall' %}
+    {{ html|safe }}
+{% elif payment == 'Xsolla' %}
+    {# Change for production deployment #}
+    <iframe src="https://sandbox-secure.xsolla.com/paystation2/?access_token={{ token }}" width="100%" height="500px"></iframe>
+{% endif %}

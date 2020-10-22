@@ -1,0 +1,54 @@
+{% extends 'store/default-new/base.html' %}
+
+{% block title %}{{ webstore.name }} | {{ language.translations.privacy_policy }}{% endblock %}
+
+{% block content %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load modules %}
+
+{% load currency %}
+
+    {% include 'store/default-new/top-nav.html' %}
+
+    <div class="{% if webstore_config.vertical_nav %}flex{% endif %}">
+        {% include 'store/default-new/nav.html' %}
+
+        <div class="{% if webstore_config.vertical_nav %}w-4/5 pl-3{% endif %}">
+
+            <div class="{% if not webstore_config.vertical_nav %}flex{% endif %}">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} mr-4 mt-0 ml-2">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="w-full">
+                    <div class="card mr-0 mt-0">
+                        <div class="card-header">
+                            <h3>{{ language.translations.payment_completed }}</h3>
+                        </div>
+                        <div class="card-body pt-3">
+
+                            {% if webstore.payment_complete_page %}
+                                <p>{{ webstore.payment_complete_page|safe }}</p>
+                            {% else %}
+                                <p>{{ language.translations.payment_complete }} <br/><br/>
+                                {{ language.translations.how_to_receive_commands }}<br/><br/>
+
+                                {{ language.translations.thank_you_for_purchasing }}</p>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

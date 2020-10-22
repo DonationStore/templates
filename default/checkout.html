@@ -57,13 +57,14 @@
                     {% if webstore.require_billing_details %}
                         <br/>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="{% if webstore.number_of_address_lines == 'one' %}col-md-12{% else %}col-md-6{% endif %}">
                                 <div class="form-group">
                                     <label for="address_line_1">{{ language.translations.address_line_1 }}</label>
                                     <input type="text" class="form-control" id="address_line_1" name="address_line_1"
                                            required>
                                 </div>
                             </div>
+                            {% if webstore.number_of_address_lines == 'two' %}
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="address_line_2">{{ language.translations.address_line_2 }}</label>
@@ -71,6 +72,7 @@
                                            required>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                         <div class="row">
                             <div class="col-md-6">
@@ -969,6 +971,45 @@
                         </div>
                     </div>
                 </form>
+
+                {% if player_referrals and not player_referred %}
+                    <div class="text-right mt-3 ml-4">
+                        <button class="btn btn-success btn-sm" id="trigger-referral">Did someone refer you?</button>
+                    </div>
+
+                    <div id="player-referral" class="player-referral mt-2" style="display: none;">
+                        <div class="card">
+                            <div class="card-body">
+                                <form name="add-player-referral" action="{% url 'add-player-referral' %}" method="post">
+                                    <div class="form-group">
+                                        <label for="player-referral">Enter the username of the player who referred you</label>
+                                        <input id="player-referral" type="text" class="form-control" name="player-referral" placeholder="Minecraft IGN">
+                                        {% csrf_token %}
+                                        <div class="float-right mt-2">
+                                            <button type="submit" class="btn btn-sm btn-success">Refer Player</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if player_referred %}
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <h5>Referred By<br/><small>{{ player_referred }}</small></h5>
+                                    <a href="{% url 'remove-player-referral' %}" class="btn btn-sm btn-danger">Remove Referral</a>
+                                </div>
+                                <div class="col-md-2">
+                                    <img src="https://minotar.net/avatar/{{ player_referred }}/64"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
 
                 {% if request.session.virtual_currencies and not request.session.active_virtual_currencies %}
                     <br/><br/>

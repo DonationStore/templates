@@ -1,0 +1,121 @@
+{% extends 'store/default-new/base.html' %}
+
+{% block title %}{{ webstore.name }} | Support{% endblock %}
+
+{% block content %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load modules %}
+
+{% load currency %}
+
+    {% include 'store/default-new/top-nav.html' %}
+
+    <div class="{% if webstore_config.vertical_nav %}lg:flex block{% endif %}">
+        {% include 'store/default-new/nav.html' %}
+
+        <div class="{% if webstore_config.vertical_nav %}w-full lg:w-4/5{% endif %}">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} mr-4 mt-0">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+             <div class="card mt-0">
+                 <div class="card-header">
+                     <h3>{{ language.translations.support }}</h3>
+                     <p class="pt-2">{{ language.translations.welcome_to_support }}</p>
+                 </div>
+                 <div class="card-body">
+                     {% if not webstore.recaptcha_site_key %}
+                         <p>Cannot display support area as the reCaptcha site key has not been set. If you have not set it please do so now in your control panel.<br/>
+                             If you are unsure as to how to get a site key, please follow <a href="https://donationstore.net/docs/Configuration/Setup-reCaptcha">this tutorial.</a> <br/>
+                         </p>
+                     {% endif %}
+                 </div>
+             </div>
+
+            <div class="flex mb-3">
+                <div class="w-2/3">
+                    <div class="card mt-0">
+                        <div class="card-header">
+                            <h3>{{ language.translations.submit_ticket }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <form name="view_ticket" action="/submit-ticket" method="post">
+                                <div class="form-group">
+                                    <label for="name">{{ language.translations.name }}</label>
+                                    <input id="name" type="text" name="name" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="minecraft_ign">{{ language.translations.your_minecraft_ign }}</label>
+                                    <input id="minecraft_ign" type="text" name="minecraft_ign" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="urgency">{{ language.translations.urgency }}</label>
+                                    <select class="form-input" name="urgency" id="urgency">
+                                        <option value="L">Low</option>
+                                        <option value="N">Normal</option>
+                                        <option value="H">High</option>
+                                        <option value="U">Urgent</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">{{ language.translations.email_address }}</label>
+                                    <input id="email" type="text" name="email" class="form-input" placeholder="{{ language.translations.email_address }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject">{{ language.translations.subject }}</label>
+                                    <input id="subject" type="text" name="subject" class="form-input" placeholder="{{ language.translations.subject }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="description">{{ language.translations.describe_your_problem }}</label>
+                                    <textarea id="description" name="description" class="form-input" placeholder="{{ language.translations.describe_your_problem }}"></textarea>
+                                </div>
+                                {% csrf_token %}
+
+                                <div class="g-recaptcha" data-sitekey="{{ webstore.recaptcha_site_key }}"></div><br/>
+
+                                {{ language.translations.emailed_pin }}<br/><br/>
+
+                                <button class="button button-brand" type="submit">{{ language.translations.submit_ticket }}</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-1/3">
+                    <div class="card mt-0">
+                        <div class="card-header">
+                            <h3>{{ language.translations.view_support_ticket }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <form name="view_ticket" action="/view-ticket" method="post">
+                                <div class="form-group">
+                                    <label id="minecraft_ign">{{ language.translations.your_minecraft_ign }}</label>
+                                    <input id="minecraft_ign" type="text" name="minecraft_ign" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label id="pin">{{ language.translations.pin }}</label>
+                                    <input id="pin" type="text" name="pin" class="form-input">
+                                </div>
+
+                                <div class="g-recaptcha" data-sitekey="{{ webstore.recaptcha_site_key }}"></div><br/>
+
+                                {% csrf_token %}
+                                <button class="button button-brand" type="submit">{{ language.translations.view_support_ticket }}</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

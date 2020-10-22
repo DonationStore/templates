@@ -1,0 +1,25 @@
+{% load cart %}
+
+{% load modules %}
+
+{% gift_card_balance_module module as gift_card_balance %}
+<div class="module {% if webstore_config.vertical_nav %}flex-1 module-min-width{% else %}w-full{% endif %}">
+    <div class="module-body">
+        <div class="module-header">
+            <h3>{{ module.header }}</h3>
+        </div>
+        <form name="check_gift_card_balance" action='' method="post">
+            <div class="input-group mb-3">
+                <input type="text" class="form-input" placeholder="{{ language.translations.gift_card_number }}" name="gift_card_number">
+                {% csrf_token %}
+                <button class="button button-brand" type="submit">{{ language.translations.check }}<i class="fa fa-arrow-right"></i></button>
+            </div>
+        </form>
+        {% if gift_card %}
+            <hr/>
+            <strong>{{ language.translations.starting_balance }}</strong><div class="float-right">{{ webstore.currency }}{{ gift_card.start_balance }}</div><br/>
+            <strong>{{ language.translations.current_balance }}</strong><div class="float-right">{{ webstore.currency }}{{ gift_card.current_balance }}</div>
+        {% endif %}
+    </div>
+</div>
+

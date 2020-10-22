@@ -1,0 +1,28 @@
+{% load cart %}
+
+{% load currency %}
+
+{% load modules %}
+
+{% top_customers_module module as top_customer %}
+
+<div class="{% if webstore_config.vertical_nav %}flex-1 module-min-width{% else %}w-full{% endif %} module">
+    <div class="flex w-full h-full module-body">
+        {% if top_customer.customer %}
+        <div class="w-1/2 my-auto ml-6">
+            <h3 class="text-brand text-2xl font-bold">{{ top_customer.customer.username }}</h3>
+            <p>Top Donator
+                {% if top_customer.module.display_amount %}
+                    <span class="text-sm">{{ webstore.currency|get_currency_symbol }}{{ top_customer.customer.payment__amount__sum|floatformat }}</span>
+                {% endif %}
+            </p>
+        </div>
+        <div class="w-1/2 justify-end flex pr-4">
+            <img src="https://mc-heads.net/body/{{ top_customer.customer.username }}" class="top-donator-avatar h-48" alt="Top Donator">
+        </div>
+        {% else %}
+            No top customer for that period.
+        {% endif %}
+    </div>
+</div>
+

@@ -1,0 +1,74 @@
+{% extends 'store/default-new/base.html' %}
+
+{% block title %}{{ webstore.name }} | {{ page.title }}{% endblock %}
+
+{% block content %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load modules %}
+
+{% load currency %}
+
+    {% include 'store/default-new/top-nav.html' %}
+
+    <div class="{% if webstore_config.vertical_nav %}lg:flex block{% endif %}">
+        {% include 'store/default-new/nav.html' %}
+
+        <div class="{% if webstore_config.vertical_nav %}w-full lg:w-4/5{% else %}-mx-2{% endif %}">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} mr-4 mt-0 ml-2">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="flex">
+                {% if page.layout == 'L' %}
+                    <div class="w-1/3">
+                    {% for module in page.column1.all %}
+                        {% include module|template %}
+                    {% endfor %}
+                    </div>
+                    <div class="w-2/3">
+                    {% for module in page.column3.all %}
+                        {% include module|template %}
+                    {% endfor %}
+                    </div>
+                {% elif page.layout == 'R' %}
+                    <div class="w-2/3">
+                    {% for module in page.column1.all %}
+                        {% include module|template %}
+                    {% endfor %}
+                    </div>
+                    <div class="w-1/3">
+                    {% for module in page.column3.all %}
+                        {% include module|template %}
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="w-1/3">
+                    {% for module in page.column1.all %}
+                        {% include module|template %}
+                    {% endfor %}
+                    </div>
+                    <div class="w-1/3">
+                    {% for module in page.column2.all %}
+                        {% include module|template %}
+                    {% endfor %}
+                    </div>
+                    <div class="w-1/3">
+                    {% for module in page.column3.all %}
+                        {% include module|template %}
+                    {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,414 @@
+{% extends 'store/default-new/base.html' %}
+
+{% block title %}{{ webstore.name }} | Welcome{% endblock %}
+
+{% block content %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load static %}
+
+{% load modules %}
+
+{% load currency %}
+
+    {% include 'store/default-new/top-nav.html' %}
+
+    <div class="{% if webstore_config.vertical_nav %}lg:flex block{% endif %}">
+        {% include 'store/default-new/nav.html' %}
+
+        <div class="{% if webstore_config.vertical_nav %}w-full lg:w-4/5{% endif %}">
+
+            <div class="{% if not webstore_config.vertical_nav %}flex flex-wrap lg:flex-no-wrap -mr-4{% endif %}">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} mr-4 mt-0 ml-2">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="{% if webstore_config.vertical_nav %}w-full flex flex-wrap lg:mt-0 mt-4{% else %}lg:w-1/4 w-full order-last{% endif %}">
+                    {% if webstore.support_tickets and webstore_config.vertical_nav == False %}
+                        <a class="support" href="/support">
+                            <div class="side-nav-support-container">
+                                <i class="far fa-life-ring fa-2x my-auto"></i>
+                                <div class="ml-3">
+                                    <h6 class="hidden xl:block">Need Support?</h6>
+                                    <p><strong>Open a Ticket</strong></p>
+                                </div>
+                                <i class="fa fa-chevron-right fa-fw fa-1x my-auto ml-4"></i>
+                            </div>
+                        </a>
+                    {% endif %}
+                    {% for module in modules %}
+                        {% if module.on_homepage %}
+                            {% include module|template %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="w-full {% if not webstore_config.vertical_nav %}lg:w-3/4 pr-3 -ml-2{% endif %}">
+
+                    <div class="ml-2">
+                        <h3 class="header-text border-brand">{{ category.name }}</h3>
+                        <p class="mt-1">{{ category.description|safe }}</p>
+                    </div>
+
+
+                    {% if packages %}
+
+                        {% if category.display_as == 'C' %}
+
+                            <div class="flex mt-4 mr-4 ml-2 mb-4">
+
+                                <div class="grid grid-cols-{{ packages|length }} col-gap-4 w-full">
+
+                                    {% for package in packages %}
+                                        <div class="relative">
+                                            <div class="package-image border-b-0">
+                                                <img src="/{{ package.image }}" alt="Package Image" class="h-32">
+                                            </div>
+                                            <div class="text-center px-4 bg-main border-l-2 border-r-2 border-white">
+                                                <h2 class="bg-brand rounded-md shadow-md text-white">{{ package.name }}</h2>
+                                            </div>
+                                            <div class="text-center px-4 py-2 bg-main border-l-2 border-r-2 border-white">
+                                                <h2 class="text-2xl">{{ webstore.currency|get_currency_symbol }}{{ package.price }}</h2>
+                                            </div>
+
+                                            <div class="hidden">
+                                                <div class="text-center">
+                                                    <h2 class="text-2xl">{{ webstore.currency|get_currency_symbol }}{{ package.price }}</h2>
+                                                </div>
+                                            </div>
+                                            {% for category_feature, package_features in comparison.items %}
+                                                {% for package_feature in package_features %}
+                                                    {% if package_feature.package == package %}
+                                                        <div class="text-center bg-main border-white border-l-2 border-r-2 p-2 pb-5">
+                                                        {{ package_feature.value|safe }}
+                                                    </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+                                            <div class="bg-white rounded-b-md border-white border-l-2 border-r-2 border-b-2 p-2 pb-5 shadow-lg h-full flex">
+                                                <button href="" class="button button-brand my-auto w-full text-center modal-open" data-href="package-{{ package.id }}">Buy</button>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                        {% else %}
+
+                            {% if category.display_as == 'L' %}
+
+                                <div class="mt-2">
+
+                                    {% for package in packages %}
+
+                                        {% if package.active %}
+                                            <div class="card">
+                                                <div class="card-body py-1 m-0">
+                                                    <div class="flex h-full">
+                                                        <div class="w-1/2 my-auto">
+                                                            <h4 class="text-lg">{{ package.name }}</h4>
+                                                        </div>
+                                                        <div class="w-1/2 flex justify-end h-full">
+                                                            {% if package.show_package_until %}
+                                                                <div class="text-red-700 mr-6 my-auto" id="show_package_until_id_{{ package.id }}">&nbsp; <strong><i class="fa fa-clock"></i> {{ language.translations.ending_soon }}</strong>
+                                                                    <script>
+                                                                        // Set the date we're counting down to
+                                                                        var countDownDate_{{ package.id }} = new Date("{{ package.show_package_until|date:'m d, Y H:i' }}").getTime();
+
+                                                                        // Update the count down every 1 second
+                                                                        var x = setInterval(function() {
+
+                                                                            // Get todays date and time
+                                                                            var now = new Date().getTime();
+
+                                                                            // Find the distance between now an the count down date
+                                                                            var distance = countDownDate_{{ package.id }} - now;
+
+                                                                            // Time calculations for days, hours, minutes and seconds
+                                                                            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                                                            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                                            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                                                            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                                                                            // Display the result in the element with id="demo"
+                                                                            document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = '<strong><i class="fa fa-clock"></i> ' +days + "d " + hours + "h "
+                                                                                + minutes + "m " + seconds + "s</strong> ";
+
+                                                                            // If the count down is finished, write some text
+                                                                            if (distance < 0) {
+                                                                                clearInterval(x);
+                                                                                document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = "EXPIRED";
+                                                                            }
+                                                                        }, 1000);
+                                                                    </script>
+                                                                </div>
+                                                            {% endif %}
+                                                            <div class="mr-6 my-auto">
+                                                                {% if not package.allow_customer_change_price %}
+                                                                    {% check_for_sale package.id webstore.id as package_on_sale %}
+                                                                    {% if package_on_sale.is_on_sale %}
+                                                                        {% if 'allow_customer_to_change_price' in package_on_sale %}
+                                                                            {{ language.translations.you_decide_how_much }}
+                                                                        {% else %}
+                                                                            <strong><span class="text-red-700 text-md mr-1"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
+                                                                                <span class="text-brand">{% get_price_using_currency package_on_sale.sale_price webstore %}</span></strong>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        {% get_price_using_currency package.price webstore %}
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            </div>
+
+                                                            {# If the package is already in the cart then we display a remove button not a buy button #}
+                                                            {# First lets see if the cart has any contents #}
+                                                            {% if cart|length > 0 %}
+                                                                {# If there is stuff in the cart #}
+                                                                {# Check if that package is already in the cart #}
+                                                                {% if cart|contains_package:package.id %}
+                                                                    <form name="remove-from-cart" method="post" action="">
+                                                                        <input type="hidden" name="remove" value="true">
+                                                                        <input type="hidden" name="package_id" value="{{ package.id }}">
+                                                                        {% csrf_token %}
+                                                                        <input type="submit" value="{{ language.translations.remove }}" class="button button-danger cursor-pointer">
+                                                                    </form>
+                                                                {% else %}
+                                                                    {# If not then just display the buy button #}
+                                                                    <button type="button" class="button button-brand modal-open" data-href="package-{{ package.id }}">
+                                                                        <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
+                                                                    </button>
+                                                                {% endif %}
+                                                                {# If not then just display the buy button #}
+                                                            {% else %}
+                                                                <button type="button" class="button button-brand modal-open" data-href="package-{{ package.id }}">
+                                                                    <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
+                                                                </button>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                    {% endfor %}
+
+                                </div>
+
+                            {% else %}
+                                <div class="flex mt-2 ml-2">
+
+                                    {% for package in packages %}
+
+                                        {% if package.active %}
+
+                                            <div class="flex-1  mr-4 relative z-0">
+                                                <div class="package-image">
+                                                    {% if package.image %}
+                                                        <img src="/{{ package.image }}" alt="Package Image" class="tooltip modal-open cursor-pointer" data-href="package-{{ package.id }}" data-tippy-content="{{ language.translations.click_more_details }}">
+                                                    {% else %}
+                                                        <img src="{% static 'store_content/package_images/default_package_image.png' %}" alt="Package Image" class="tooltip modal-open cursor-pointer" data-href="package-{{ package.id }}" data-tippy-content="{{ language.translations.click_more_details }}">
+                                                    {% endif %}
+                                                </div>
+                                                <div class="package-name">
+                                                    <div class="text-center">
+                                                        <h2 class="bg-brand rounded-md shadow-md">{{ package.name }}</h2>
+                                                    </div>
+                                                </div>
+                                                <div class="package-price">
+                                                    <div class="text-center mb-2">
+                                                        {% if not package.allow_customer_change_price %}
+                                                            {% if not package.allow_customer_change_price %}
+                                                                {% check_for_sale package.id webstore.id as package_on_sale %}
+                                                                {% if package_on_sale.is_on_sale %}
+                                                                    {% if 'allow_customer_to_change_price' in package_on_sale %}
+                                                                        {{ language.translations.you_decide_how_much }}
+                                                                    {% else %}
+                                                                        <span class="text-red-700 text-md"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
+                                                                        <span class="text-brand text-xl">{% get_price_using_currency package_on_sale.sale_price webstore %}</span>
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    <h2 class="text-xl">{% get_price_using_currency package.price webstore %}</h2>
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="text-center">
+                                                        {% if package.show_package_until %}
+                                                            <div class="text-red-700 mb-2" id="show_package_until_id_{{ package.id }}"><strong><i class="fa fa-clock"></i> {{ language.translations.ending_soon }}</strong>
+                                                                <script>
+                                                                    // Set the date we're counting down to
+                                                                    var countDownDate_{{ package.id }} = new Date("{{ package.show_package_until|date:'m d, Y H:i' }}").getTime();
+
+                                                                    // Update the count down every 1 second
+                                                                    var x = setInterval(function() {
+
+                                                                        // Get todays date and time
+                                                                        var now = new Date().getTime();
+
+                                                                        // Find the distance between now an the count down date
+                                                                        var distance = countDownDate_{{ package.id }} - now;
+
+                                                                        // Time calculations for days, hours, minutes and seconds
+                                                                        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                                                        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                                        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                                                        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                                                                        // Display the result in the element with id="demo"
+                                                                        document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = '<strong><i class="fa fa-clock"></i> ' +days + "d " + hours + "h "
+                                                                            + minutes + "m " + seconds + "s</strong> ";
+
+                                                                        // If the count down is finished, write some text
+                                                                        if (distance < 0) {
+                                                                            clearInterval(x);
+                                                                            document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = "EXPIRED";
+                                                                        }
+                                                                    }, 1000);
+                                                                </script>
+                                                            </div>
+                                                        {% endif %}
+                                                        {% if cart|length > 0 %}
+                                                            {# If there is stuff in the cart #}
+                                                            {# Check if that package is already in the cart #}
+                                                            {% if cart|contains_package:package.id %}
+                                                                <form name="remove-from-cart" method="post" action="">
+                                                                    <input type="hidden" name="remove" value="true">
+                                                                    <input type="hidden" name="package_id" value="{{ package.id }}">
+                                                                    {% csrf_token %}
+                                                                    <input type="submit" value="{{ language.translations.remove }}" class="button button-danger cursor-pointer">
+                                                                </form>
+                                                            {% else %}
+                                                                {# If not then just display the buy button #}
+                                                                <button type="button" class="button button-brand modal-open cursor-pointer" data-href="package-{{ package.id }}">
+                                                                    <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
+                                                                </button>
+                                                            {% endif %}
+                                                            {# If not then just display the buy button #}
+                                                        {% else %}
+                                                            <button type="button" class="button button-brand modal-open cursor-pointer" data-href="package-{{ package.id }}">
+                                                                <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
+                                                            </button>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                        {% endif %}
+
+                        {% for package in packages %}
+                            <div class="modal" id="package-{{ package.id }}">
+                                <div class="modal-overlay"></div>
+                                <div class="modal-container">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h2>{{ package.name }}</h2>
+                                            <div class="modal-close">
+                                                <i class="fa fa-times"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex">
+
+                                            <div class="w-1/3">
+                                                <img src="/{{ package.image.url }}" alt="Package Image">
+                                            </div>
+
+                                            <div class="w-2/3">
+                                                {{ package.description|safe }}
+                                            </div>
+
+                                        </div>
+
+                                        <div class="modal-footer mt-6 w-full">
+                                            <form name="add-to-cart" method="post" action="" class="w-full">
+                                                <div class="flex w-full flex-wrap">
+                                                    <div class="w-1/3 text-left">
+                                                        <div class="flex justify-start">
+                                                            {% if package.allow_customer_change_price %}
+                                                                <strong>You choose price.</strong>
+                                                            {% elif package.price == 0 %}
+                                                                <strong>Free.</strong>
+                                                            {% else %}
+                                                                {% if not package.allow_customer_change_price %}
+                                                                    {% check_for_sale package.id webstore.id as package_on_sale %}
+                                                                    {% if package_on_sale.is_on_sale %}
+                                                                        {% if 'allow_customer_to_change_price' in package_on_sale %}
+                                                                            {{ language.translations.you_decide_how_much }}
+                                                                        {% else %}
+                                                                            <strong><span class="text-red-700 text-md mr-1"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
+                                                                            <span class="text-brand">{% get_price_using_currency package_on_sale.sale_price webstore %}</span></strong>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        {% get_price_using_currency package.price webstore %}
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="w-2/3">
+                                                        <input name="package_id" value="{{ package.id }}" type="hidden">
+                                                        <div class="flex justify-end">
+                                                            {% csrf_token %}
+                                                            {% get_add_to_cart_buttons language package_payments package webstore as cart_button %}
+                                                            {% if cart_button.is_allowed_to_purchase %}
+                                                                {% if package.purchase_type == 'O' %}
+                                                                    <input type="submit" name="add_to_cart" class="button button-brand cursor-pointer" value="{{ language.translations.add_to_cart }}">
+                                                                {% elif package.purchase_type == 'S' %}
+                                                                    <input type="submit" name="add_to_cart" class="button button-brand cursor-pointer" value="{{ language.translations.add_to_cart }}">
+                                                                {% endif %}
+                                                            {% else %}
+                                                                <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="{{ cart_button.reason }}">
+                                                                    {% if package.purchase_type == 'O' %}
+                                                                        <button class="button button-brand cursor-pointer" style="pointer-events: none;" type="button" disabled>{{ language.translations.add_to_cart }}</button>
+                                                                    {% elif package.purchase_type == 'S' %}
+                                                                        <button class="button button-brand cursor-pointer" style="pointer-events: none;" type="button" disabled>{{ language.translations.subscribe }}</button>
+                                                                    {% endif %}
+                                                                </span>
+                                                            {% endif %}
+                                                            {% if webstore.allow_gifting and not package.disable_gifting %}
+                                                                <button type="button" class="button button-info dropdown-toggle gift-package" data-toggle="dropdown" data-package="{{ package.id }}">
+                                                                    <i class="fa fa-gift"></i> {{ language.translations.gift_this_package }}
+                                                                </button>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="w-full gift-username" id="gift-{{ package.id }}">
+                                                    {% if webstore.allow_gifting and not package.disable_gifting %}
+                                                        <div class="dropdown-menu dropdown-menu-right" style="width: 100%; padding: 10px;">
+                                                            <div class="form-group">
+                                                                <input type="text" class="form-input" placeholder="{{ language.translations.enter_gift_ign }}" name="gifting_ign">
+                                                                <div class="float-right">
+                                                                    <input class="button button-brand cursor-pointer" type="submit" value="{{ language.translations.gift }}">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="mt-4">
+                            No packages.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{% load cart %}
+
+{% load modules %}
+
+{% text_box_module module as text_box %}
+<div class="module {% if webstore_config.vertical_nav %}flex-1 module-min-width{% else %}w-full{% endif %}">
+    <div class="module-body">
+        <h3 class="module-header">{{ module.header }}</h3>
+        {{ text_box.text|safe }}
+    </div>
+</div>
+

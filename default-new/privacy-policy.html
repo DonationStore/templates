@@ -1,0 +1,47 @@
+{% extends 'store/default-new/base.html' %}
+
+{% block title %}{{ webstore.name }} | {{ language.translations.privacy_policy }}{% endblock %}
+
+{% block content %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load modules %}
+
+{% load currency %}
+
+    {% include 'store/default-new/top-nav.html' %}
+
+    <div class="{% if webstore_config.vertical_nav %}lg:flex block{% endif %}">
+        {% include 'store/default-new/nav.html' %}
+
+        <div class="{% if webstore_config.vertical_nav %}w-full lg:w-4/5{% else %}-ml-2{% endif %}">
+
+            <div class="{% if not webstore_config.vertical_nav %}flex flex-wrap lg:flex-no-wrap -mr-4{% endif %}">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} mr-4 mt-0 ml-2">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="w-full lg:mt-0 mt-4 mr-2">
+                    <div class="card mt-0">
+                        <div class="card-header">
+                            <h3>{{ language.translations.privacy_policy }}</h3>
+                        </div>
+                        <div class="card-body pt-3">
+
+                            <p>{{ webstore.privacy_policy|safe }}</p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

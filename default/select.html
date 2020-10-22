@@ -32,6 +32,30 @@
                     <div class="card-body">
                         <p>{{ language.translations.need_details }}</p>
                         <form name="option-form" action="" method="post">
+                            {% if request.session.require_discord_login %}
+                                {% if webstore.discord_client_id and webstore.discord_client_secret %}
+                                    {% is_logged_in_to_discord webstore as discord_user %}
+                                    {% if discord_user %}
+                                        <img src="https://cdn.discordapp.com/avatars/{{ discord_user.id }}/{{ discord_user.avatar }}.png" class="discord-avatar" alt="Discord Avatar">
+                                        {{ language.translations.logged_in_as_discord_user }} {{ discord_user.username }}#{{ discord_user.discriminator }}
+                                        <div class=" float-right">
+                                            <a href="https://discord.com/api/oauth2/authorize?client_id={{ webstore.discord_client_id }}&redirect_uri=https://{{ webstore.sub_domain }}/api/oauth/authorize&response_type=code&scope=identify" class="btn btn-success btn-sm">
+                                                {{ language.translations.login_as_different_discord_user }}
+                                            </a>
+                                        </div>
+                                        <br/><br/>
+                                    {% else %}
+                                        {{ language.translations.package_requires_discord_login }}<br/><br/>
+                                        <a href="https://discord.com/api/oauth2/authorize?client_id={{ webstore.discord_client_id }}&redirect_uri=https://{{ webstore.sub_domain }}/api/oauth/authorize&response_type=code&scope=identify" class="btn btn-success">
+                                            {{ language.translations.login_with_discord }}
+                                        </a>
+                                        <br/><br/>
+                                    {% endif %}
+                                {% else %}
+                                    {{ language.translations.cannot_purchase_discord_not_setup }}
+                                {% endif %}
+                            {% endif %}
+
                             {% if allow_customer_change_price %}
                                 <div class="input-group mb-3">
                                     <input type="number" step="0.01" name="customers_price" placeholder="{{ language.translations.please_enter_price }}" class="form-control form-control-lg">

@@ -1,0 +1,66 @@
+{% extends 'store/default-new/base.html' %}
+
+{% block title %}{{ webstore.name }} | Welcome{% endblock %}
+
+{% block content %}
+
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load modules %}
+
+{% load currency %}
+
+    {% include 'store/default-new/top-nav.html' %}
+
+    <div class="{% if webstore_config.vertical_nav %}lg:flex block{% endif %}">
+        {% include 'store/default-new/nav.html' %}
+
+        <div class="{% if webstore_config.vertical_nav %}w-full lg:w-4/5{% endif %}">
+
+            <div class="{% if not webstore_config.vertical_nav %}flex flex-wrap lg:flex-no-wrap -mr-4{% endif %}">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} mr-4 mt-0 ml-2">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="{% if webstore_config.vertical_nav %}w-full flex flex-wrap lg:mt-0 mt-4{% else %}lg:w-1/4 w-full order-last{% endif %}">
+                    {% if webstore.support_tickets and webstore_config.vertical_nav == False %}
+                        <a class="support" href="/support">
+                            <div class="side-nav-support-container">
+                                <i class="far fa-life-ring fa-2x my-auto"></i>
+                                <div class="ml-3">
+                                    <h6 class="hidden xl:block">Need Support?</h6>
+                                    <p><strong>Open a Ticket</strong></p>
+                                </div>
+                                <i class="fa fa-chevron-right fa-fw fa-1x my-auto ml-4"></i>
+                            </div>
+                        </a>
+                    {% endif %}
+                    {% for module in modules %}
+                        {% if module.on_homepage %}
+                            {% include module|template %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="w-full {% if not webstore_config.vertical_nav %}lg:w-3/4 pr-3 -ml-2{% endif %}">
+                    <div class="card mt-0 mr-0">
+                        <div class="card-header">
+                            <h3>{{ language.translations.welcome_to_the }} {{ webstore.name }} {{ language.translations.store }}</h3>
+                        </div>
+                        <div class="card-body mt-2">
+                            {{ webstore.homepage_message|safe }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

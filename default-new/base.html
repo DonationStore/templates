@@ -1,13 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>{% block title %}{% endblock %}</title>
+
+    {% load cart %}
+
+    {% load config %}
+
     {% load static %}
+
     {% load currency %}
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" type="text/css" href="/static/default/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/static/default/css/default.css">
+    <link rel="stylesheet" href="{% static 'default-new/main.css' %}">
+
+    <!-- Tippy and Popper for Tooltips -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
 
     <link rel="icon" href="{{ webstore.favicon }}">
 
@@ -17,9 +27,109 @@
 
     <script src="https://js.stripe.com/v3/"></script>
 
+    {% get_config as webstore_config %}
+
+    {% if webstore_config.colours %}
+        <style>
+            .bg-brand {
+                background-color: {{ webstore_config.colours.brand }} !important;
+            }
+
+            .bg-secondary {
+                background-color: {{ webstore_config.colours.secondary }} !important;
+            }
+
+            .text-secondary {
+                color: {{ webstore_config.colours.secondary }} !important;
+            }
+
+            .content-bg {
+                background-color: {% if webstore_config.colours.content_bg %}{{ webstore_config.colours.content_bg }}{% else %}#F2F2F2{% endif %}
+            }
+
+            .module-body, .card, .category, .cart-drawer {
+                background-color: {% if webstore_config.colours.card_bg %}{{ webstore_config.colours.card_bg }}{% else %}#FFFFFF{% endif %}
+            }
+
+            .module-body>p, .module-body>h3, .module-header, .card-header, .card-body, .category, .cart-drawer {
+                color: {% if webstore_config.colours.primary_text %}{{ webstore_config.colours.primary_text }}{% else %}#000000{% endif %} !important;
+            }
+
+            .text-brand {
+                color: {{ webstore_config.colours.brand }} !important;
+            }
+
+            .border-brand {
+                border-color: {{ webstore_config.colours.brand }} !important;
+            }
+
+            .card-header > h3, .module-header {
+                border-color: {{ webstore_config.colours.brand }} !important;
+            }
+
+            .button-brand {
+                background-color: {{ webstore_config.colours.brand }} !important;
+            }
+
+        </style>
+    {% endif %}
+
 </head>
-<body>
-{% block content %}{% endblock content %}
+<body class="content-bg">
+    <div class="header-background absolute bg-brand w-full h-56 top-0">
+    </div>
+
+    <div class="lg:mx-24 mt-12 h-full relative">
+        {% block content %}{% endblock content %}
+    </div>
+
+
+    <!-- Cart -->
+    <div class="cart-drawer hidden" id="cart-drawer">
+
+        <div class="absolute left-0 -ml-12">
+            <button class="button button-danger w-10 h" id="close-cart-drawer">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+
+        <h2 class="header-text mt-0 border-brand">
+            <span class="block -mb-2">{{ language.translations.your_cart }}</span>
+            {% if cart %}
+            <small class="text-sm">{{ cart|length }} {{ language.translations.items_for }} {% get_price_using_currency cart_total|floatformat:2 webstore %}</small>
+            {% endif %}
+        </h2>
+
+
+        <div class="mt-5">
+            {% if cart %}
+                {% for item in cart %}
+                    {% get_package_by_id item.id as package %}
+                    <div class="cart-drawer-package">
+                        <h4 class="text-brand font-bold">{{ item.quantity }}x - {{ package.name }}</h4>
+                        <small>
+                            {{ webstore.currency|get_currency_symbol }}
+                            {% if package.price == 0 %}Free
+                            {% elif item.customers_price %}{{ item.customers_price|multiply:item.quantity|floatformat:2 }}
+                            {% elif item.variables %}
+                                {% get_sub_total_including_variables item.variables package as sub_total %}
+                                {{ sub_total|multiply:item.quantity|floatformat:2 }}
+                            {% else %}
+                                {{ package.price|multiply:item.quantity|floatformat:2 }}
+                            {% endif %}
+                        </small>
+                    </div>
+                {% endfor %}
+
+                <a href="/checkout" class="button button-brand">{{ language.translations.checkout }} <i class="fa fa-arrow-right"></i></a>
+            {% else %}
+                {{ language.translations.no_items_in_cart }}
+            {% endif %}
+        </div>
+    </div>
+
+    {% include 'store/default-new/footer.html' %}
+
 {% if stripe_gateway %}
     <script>
         // Create a Stripe client.
@@ -114,14 +224,8 @@
 {% endif %}
 </body>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-<script src="/static/assets/js/store.js"></script>
-<script src="/static/default/js/bootstrap.min.js"></script>
+<script src="{% static 'default-new/main.js' %}"></script>
 <script>
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-
     {% for virtual_currency in request.session.virtual_currencies %}
         $('#{{ virtual_currency.code }}Amount').bind('keyup change', function() {
             var amount = $(this).val() / {{ virtual_currency.exchange_rate }};

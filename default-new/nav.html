@@ -1,0 +1,270 @@
+{# Loading the required template tags #}
+{% load cart %}
+
+{% load static %}
+
+{% load currency %}
+
+<div class="{% if webstore_config.vertical_nav %}w-full lg:w-1/5{% endif %}">
+
+    <!-- Nav -->
+    <div class="w-full bg-white lg:hidden block">
+        <div class="p-3 text-center">
+            <button class="button button-brand" id="show-mobile-nav"><i class="fa fa-bars fa-2x"></i></button>
+        </div>
+    </div>
+    <div class="{% if webstore_config.vertical_nav %}side-nav{% else %}top-nav-container{% endif %} w-full">
+        <div class="{% if webstore_config.vertical_nav %}side-nav-login mr-2{% else %}top-nav-login{% endif %} hidden lg:flex">
+            <div class="side-nav-login-container">
+                {% is_logged_in webstore as logged_in %}
+                {% if logged_in %}
+                    {% get_user webstore as logged_in_user %}
+                    <div class="w-4/5">
+                        <div class="flex">
+                            <img src="https://minotar.net/avatar/{{ logged_in_user.username }}" class="login-avatar" alt="Logged in User's Avatar">
+                            <div class="ml-3 my-auto">
+                                <h6 class="text-xs hidden xl:block">{{ language.translations.logged_in_as_minecraft_user }}</h6>
+                                <p><strong>{{ logged_in_user.username }}</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-1/5 flex">
+                        <a class="logout-icon tooltip" data-tippy-content="{{ language.translations.logout }}" href="/logout"><i class="fa fa-sign-out-alt"></i></a>
+                    </div>
+                {% else %}
+                    <div class="w-4/5">
+                        <div class="flex h-full">
+                            <i class="fa fa-user fa-fw fa-2x my-auto"></i>
+                            <h6 class="text-lg my-auto ml-3">{{ language.translations.not_logged_in }}</h6>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Mobile Nav -->
+        <div class="w-full bg-white lg:hidden hidden mb-4" id="mobile-nav">
+
+            {% for category in category_tree %}
+                {% if category.sub_categories %}
+                    {# Now that we know there are subcategories, make a dropdown. #}
+                    <div class="mobile-category dropdown flex justify-center">
+                        {% if webstore_config.vertical_nav %}
+                            <div class="float-right">
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                            <h3 class="text-lg parent-category"><a href="">{{ category.parent.name }}</a></h3>
+                        {% else %}
+                            <h3 class="text-lg text-center"><a href="">{{ category.parent.name }}</a></h3>
+                            <div class="ml-3">
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="bg-gray-200 dropdown-menu hidden">
+                        {% if category.parent.do_not_display_in_subcategory_dropdown is False %}
+                            <div class="mobile-category">
+                                <h3>
+                                    <a href="/category/{% if category.parent.slug %}{{ category.parent.slug }}{% else %}{{ category.parent.id }}{% endif %}">{{ category.parent.name }}</a>
+                                    {% if sales_data.categories_on_sale %}
+                                        {% for category_sale in sales_data.categories_on_sale %}
+                                            {% if category.parent.id == category_sale.category_id %}
+                                                <span class="badge badge-danger">On Sale</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if category.id in sales_data.categories_on_sale.category_id %}
+                                            <span class="badge badge-danger">On Sale</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </h3>
+                            </div>
+                        {% endif %}
+                        {% for sub_category in category.sub_categories %}
+                            {% if sub_category.do_not_display_in_subcategory_dropdown is False %}
+                                <div class="mobile-category">
+                                    <h3 class="text-lg">
+                                        <a href="/category/{% if sub_category.slug %}{{ sub_category.slug }}{% else %}{{ sub_category.id }}{% endif %}">{{ sub_category.name }}</a>
+                                        {% if sales_data.categories_on_sale %}
+                                            {% for category_sale in sales_data.categories_on_sale %}
+                                                {% if sub_category.id == category_sale.category_id %}
+                                                    <span class="badge badge-danger">On Sale</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if sub_category.id in sales_data.categories_on_sale.category_id %}
+                                                <span class="badge badge-danger">On Sale</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </h3>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {# If not just list the category as normal #}
+                    <div class="mobile-category">
+                        <h3 class="text-lg">
+                            <a href="/category/{% if category.parent.slug %}{{ category.parent.slug }}{% else %}{{ category.parent.id }}{% endif %}">{{ category.parent.name }}</a>
+                            {% if sales_data.categories_on_sale %}
+                                {% for category_sale in sales_data.categories_on_sale %}
+                                    {% if category.parent.id == category_sale.category_id %}
+                                        <span class="badge badge-danger">On Sale</span>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if category.id in sales_data.categories_on_sale.category_id %}
+                                    <span class="badge badge-danger">On Sale</span>
+                                {% endif %}
+                            {% endif %}
+                        </h3>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {% for page in pages %}
+                {% if page.status and page.add_to_menu %}
+                    {% if page.logged_in_to_view %}
+                        {% if request.session.logged_in %}
+                            <div class="mobile-category">
+                                <h3 class="text-lg">
+                                    <a class="nav-link" href="/{{ page.url }}">{{ page.title }}</a>
+                                </h3>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="mobile-category">
+                            <h3 class="text-lg">
+                                <a class="nav-link" href="/{{ page.url }}">{{ page.title }}</a>
+                            </h3>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            {% if webstore.support_tickets %}
+                <a class="side-nav-support" href="/support">
+                    <div class="side-nav-support-container justify-center">
+                        <i class="far fa-life-ring fa-2x my-auto"></i>
+                        <div class="ml-3">
+                            <h6>Need Support?</h6>
+                            <p><strong>Open a Ticket</strong></p>
+                        </div>
+                    </div>
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="{% if webstore_config.vertical_nav %}side-nav-body lg:block mr-2{% else %}top-nav-body lg:flex{% endif %} hidden">
+
+            {% for category in category_tree %}
+                {% if category.sub_categories %}
+                    {# Now that we know there are subcategories, make a dropdown. #}
+                    <div class="category dropdown {% if not webstore_config.vertical_nav %}flex{% endif %}">
+                        {% if webstore_config.vertical_nav %}
+                            <div class="float-right mr-2">
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                            <h3 class="text-lg"><a href="">{{ category.parent.name }}</a></h3>
+                        {% else %}
+                            <h3 class="text-lg"><a href="">{{ category.parent.name }}</a></h3>
+                            <div class="ml-3">
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="bg-gray-200 {% if not webstore_config.vertical_nav %}top-nav-dropdown{% endif %} dropdown-menu hidden">
+                        {% if category.parent.do_not_display_in_subcategory_dropdown is False %}
+                            <div class="category">
+                                <h3 class="text-lg">
+                                    <a href="/category/{% if category.parent.slug %}{{ category.parent.slug }}{% else %}{{ category.parent.id }}{% endif %}">{{ category.parent.name }}</a>
+                                    {% if sales_data.categories_on_sale %}
+                                        {% for category_sale in sales_data.categories_on_sale %}
+                                            {% if category.parent.id == category_sale.category_id %}
+                                                <span class="badge badge-danger">On Sale</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if category.id in sales_data.categories_on_sale.category_id %}
+                                            <span class="badge badge-danger">On Sale</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </h3>
+                            </div>
+                        {% endif %}
+                        {% for sub_category in category.sub_categories %}
+                            {% if sub_category.do_not_display_in_subcategory_dropdown is False %}
+                                <div class="category">
+                                    <h3 class="text-lg">
+                                        <a href="/category/{% if sub_category.slug %}{{ sub_category.slug }}{% else %}{{ sub_category.id }}{% endif %}">{{ sub_category.name }}</a>
+                                        {% if sales_data.categories_on_sale %}
+                                            {% for category_sale in sales_data.categories_on_sale %}
+                                                {% if sub_category.id == category_sale.category_id %}
+                                                    <span class="badge badge-danger">On Sale</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if sub_category.id in sales_data.categories_on_sale.category_id %}
+                                                <span class="badge badge-danger">On Sale</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </h3>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {# If not just list the category as normal #}
+                    <div class="category">
+                        <h3 class="text-lg">
+                            <a href="/category/{% if category.parent.slug %}{{ category.parent.slug }}{% else %}{{ category.parent.id }}{% endif %}">{{ category.parent.name }}</a>
+                            {% if sales_data.categories_on_sale %}
+                                {% for category_sale in sales_data.categories_on_sale %}
+                                    {% if category.parent.id == category_sale.category_id %}
+                                        <span class="badge badge-danger">On Sale</span>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if category.id in sales_data.categories_on_sale.category_id %}
+                                    <span class="badge badge-danger">On Sale</span>
+                                {% endif %}
+                            {% endif %}
+                        </h3>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {% for page in pages %}
+                {% if page.status and page.add_to_menu %}
+                    {% if page.logged_in_to_view %}
+                        {% if request.session.logged_in %}
+                            <div class="category">
+                                <h3 class="text-lg">
+                                    <a class="nav-link" href="/{{ page.url }}">{{ page.title }}</a>
+                                </h3>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="category">
+                            <h3 class="text-lg">
+                                <a class="nav-link" href="/{{ page.url }}">{{ page.title }}</a>
+                            </h3>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            {% if webstore.support_tickets and webstore_config.vertical_nav %}
+                <a class="side-nav-support" href="/support">
+                    <div class="side-nav-support-container">
+                        <i class="far fa-life-ring fa-2x my-auto"></i>
+                        <div class="ml-3">
+                            <h6 class="hidden xl:block">Need Support?</h6>
+                            <p><strong>Open a Ticket</strong></p>
+                        </div>
+                        <i class="fa fa-chevron-right fa-fw fa-1x my-auto ml-4"></i>
+                    </div>
+                </a>
+            {% endif %}
+
+        </div>
+        <!-- End Nav -->
+    </div>
+
+</div>

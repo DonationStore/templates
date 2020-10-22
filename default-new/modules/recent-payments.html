@@ -1,0 +1,31 @@
+{% load cart %}
+
+{% load currency %}
+
+{% load modules %}
+
+{% recent_payments_module module as recent_payments %}
+<div class="{% if webstore_config.vertical_nav %}flex-1 module-min-width{% else %}w-full{% endif %} module">
+    <div class="module-body">
+        <h3 class="module-header">{{ module.header }}</h3>
+        <div class="recent-donations">
+            {% for payment in recent_payments.payments %}
+                <img src="https://minotar.net/avatar/{{ payment.payment.customer.username }}/35" alt="Recent Donation"
+                     data-tippy-content="{{ payment.payment.customer.username }}
+                                {% if recent_payments.module.display_time_of_purchase %}
+                                    - {{ payment.payment.date }}
+                                {% endif %}
+                                <br/>
+                                {% if recent_payments.module.display_purchased_package %}
+                                {% for package_bought in payment.packages_bought %}
+                                    {{ package_bought }} {% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if recent_payments.module.display_price_of_purchase %}
+                                - {{ webstore.currency|get_currency_symbol }}{{ payment.payment.amount }}
+                            {% endif %}
+                " class="cursor-pointer">
+            {% endfor %}
+        </div>
+    </div>
+</div>

@@ -24,334 +24,332 @@
                 </div>
             {% endfor %}
         {% endif %}
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="text-center">
-                            {% if category.image %}
+        {% if category.display_as == 'C' %}
+            <table class="table table-striped">
+                <tbody>
+                    <thead>
+                        <td style="border-top: none !important;"></td>
+                        {% for package in packages %}
+                            <td style="border-top: none !important;">
                                 <div class="text-center">
-                                    <img src="/{{ category.image.url }}" width="100%">
+                                    {% if package.image %}
+                                        <a data-toggle="modal" data-target="#package-{{ package.id }}"><img src="/{{ package.image.url }}" data-toggle="tooltip" data-html="true" title="{{ language.translations.click_more_details }}" width="190px" height="190px" style="border-radius: 5px;"/></a>
+                                    {% else %}
+                                        <a data-toggle="modal" data-target="#package-{{ package.id }}"><img src="/static/store_content/package_images/default_package_image.png" data-toggle="tooltip" data-html="true" title="{{ language.translations.click_more_details }}" width="190px" height="190px" style="border-radius: 5px;"/></a>
+                                    {% endif %}
                                 </div>
-                                <br/>
-                            {% endif %}
+                                <div style="padding:8px; margin:0px; padding-bottom: 0px;">
+                                    <div class="float-right">
+                                        {# If the package is already in the cart then we display a remove button not a buy button #}
+                                        {# First lets see if the cart has any contents #}
+                                        {% if cart|length > 0 %}
+                                            {# If there is stuff in the cart #}
+                                            {# Check if that package is already in the cart #}
+                                            {% if cart|contains_package:package.id %}
+                                                <form name="remove-from-cart" method="post" action="">
+                                                    <input type="hidden" name="remove" value="true">
+                                                    <input type="hidden" name="package_id" value="{{ package.id }}">
+                                                    {% csrf_token %}
+                                                    <input type="submit" value="{{ language.translations.remove }}" class="btn btn-sm btn-danger btn-block">
+                                                </form>
+                                            {% else %}
+                                                {# If not then just display the buy button #}
+                                                <button type="button" class="btn btn-sm btn-secondary btn-block" data-toggle="modal" data-target="#package-{{ package.id }}">
+                                                    <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
+                                                </button>
+                                            {% endif %}
+                                            {# If not then just display the buy button #}
+                                        {% else %}
+                                            <button type="button" class="btn btn-sm btn-secondary btn-block" data-toggle="modal" data-target="#package-{{ package.id }}">
+                                                <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                    <p style="padding-top:0px; margin:0px; font-size: 12px;">{{ package.name }}<br/>
+                                        {% if package.show_package_until %}
+                                            <div style="font-size: 12px;" class="text text-danger" id="show_package_until_id_{{ package.id }}"><strong><i class="fa fa-clock"></i> {{ language.translations.ending_soon }}</strong>
+                                                <script>
+                                                    // Set the date we're counting down to
+                                                    var countDownDate_{{ package.id }} = new Date("{{ package.show_package_until|date:'m d, Y H:i' }}").getTime();
+
+                                                    // Update the count down every 1 second
+                                                    var x = setInterval(function() {
+
+                                                        // Get todays date and time
+                                                        var now = new Date().getTime();
+
+                                                        // Find the distance between now an the count down date
+                                                        var distance = countDownDate_{{ package.id }} - now;
+
+                                                        // Time calculations for days, hours, minutes and seconds
+                                                        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                                        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                                        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                                                        // Display the result in the element with id="demo"
+                                                        document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = '<strong><i class="fa fa-clock"></i> ' +days + "d " + hours + "h "
+                                                            + minutes + "m " + seconds + "s</strong> ";
+
+                                                        // If the count down is finished, write some text
+                                                        if (distance < 0) {
+                                                            clearInterval(x);
+                                                            document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = "EXPIRED";
+                                                        }
+                                                    }, 1000);
+                                                </script>
+                                            </div>
+                                        {% endif %}
+                                    {% if not package.allow_customer_change_price %}
+                                        {% if not package.allow_customer_change_price %}
+                                            {% check_for_sale package.id webstore.id as package_on_sale %}
+                                            {% if package_on_sale.is_on_sale %}
+                                                {% if 'allow_customer_to_change_price' in package_on_sale %}
+                                                    {{ language.translations.you_decide_how_much }}
+                                                {% else %}
+                                                    <span class="text-danger"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
+                                                    <span class="text-success">{% get_price_using_currency package_on_sale.sale_price webstore %}</span>
+                                                {% endif %}
+                                            {% else %}
+                                                {% get_price_using_currency package.price webstore %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <!-- Modal -->
+                                <div class="modal fade" id="package-{{ package.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">{{ package.name }}</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% if package.image %}
+                                                    <img style='float:left;height:170px; width:170px; margin-right:10px;' src="/{{ package.image.url }}"/>
+                                                {% endif %}
+                                                {{ package.description|safe }}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <strong>
+                                                    {% if package.allowas_customer_change_price %}
+                                                        You choose price.
+                                                    {% elif package.price == 0 %}
+                                                        Free.
+                                                    {% else %}
+                                                        {% if not package.allow_customer_change_price %}
+                                                            {% check_for_sale package.id webstore.id as package_on_sale %}
+                                                            {% if package_on_sale.is_on_sale %}
+                                                                {% if 'allow_customer_to_change_price' in package_on_sale %}
+                                                                    {{ language.translations.you_decide_how_much }}
+                                                                {% else %}
+                                                                    <span class="text-danger"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
+                                                                    <span class="text-success">{% get_price_using_currency package_on_sale.sale_price webstore %}</span>
+                                                                {% endif %}
+                                                            {% else %}
+                                                                {% get_price_using_currency package.price webstore %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </strong>
+                                                <form name="add-to-cart" method="post" action="">
+                                                    <input name="package_id" value="{{ package.id }}" type="hidden">
+                                                    {% csrf_token %}
+                                                    {% get_add_to_cart_buttons language package_payments package webstore as cart_button %}
+                                                    {% if cart_button.is_allowed_to_purchase %}
+                                                        {% if package.purchase_type == 'O' %}
+                                                            <input type="submit" name="add_to_cart" class="btn btn-primary" value="{{ language.translations.add_to_cart }}">
+                                                        {% elif package.purchase_type == 'S' %}
+                                                            <input type="submit" name="add_to_cart" class="btn btn-primary" value="{{ language.translations.add_to_cart }}">
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="{{ cart_button.reason }}">
+                                                            {% if package.purchase_type == 'O' %}
+                                                                <button class="btn btn-primary" style="pointer-events: none;" type="button" disabled>{{ language.translations.add_to_cart }}</button>
+                                                            {% elif package.purchase_type == 'S' %}
+                                                                <button class="btn btn-primary" style="pointer-events: none;" type="button" disabled>{{ language.translations.subscribe }}</button>
+                                                            {% endif %}
+                                                        </span>
+                                                    {% endif %}
+                                                    {% if webstore.allow_gifting and not package.disable_gifting and package not in packages_with_discord_actions %}
+                                                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                                                            {{ language.translations.gift_this_package }}
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-right" style="width: 100%; padding: 10px;">
+                                                            <div class="form-group">
+                                                                <input type="text" class="form-control" placeholder="{{ language.translations.enter_gift_ign }}" name="gifting_ign">
+                                                                <input class="btn btn-success btn-block btn-sm" type="submit" value="{{ language.translations.gift }}">
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        {% endfor %}
+                    </thead>
+                    {% for category_feature, package_features in comparison.items %}
+                        <tr>
+                            <td>{{ category_feature }}</td>
+                            {% for package_feature in package_features %}
+                                <td class="text-center">{{ package_feature.value|safe }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-center">
+                                {% if category.image %}
+                                    <div class="text-center">
+                                        <img src="/{{ category.image.url }}" width="100%">
+                                    </div>
+                                    <br/>
+                                {% endif %}
+                            </div>
+                            {{ category.description|safe }}
                         </div>
-                        {{ category.description|safe }}
                     </div>
                 </div>
-            </div>
-            <div class="col-md-8">
-                {# Sale Advertisement for the Category #}
-                {% if packages %}
-                    {% if category.id in sales_data.categories_on_sale %}
-                        <div class="alert alert-success" role="alert">
-                            {{ language.translations.sale_on_category }} {{ category.name }}
-                        </div>
+                <div class="col-md-8">
+                    {# Sale Advertisement for the Category #}
+                    {% if packages %}
+                        {% if category.id in sales_data.categories_on_sale %}
+                            <div class="alert alert-success" role="alert">
+                                {{ language.translations.sale_on_category }} {{ category.name }}
+                            </div>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
 
-                <div class="card">
-                    <div class="card-header">{{ category.name }}</div>
-                    <div class="card-body">
-                        {% if packages %}
-                            {# If the packages are to be displayed as a list #}
-                            {% if category.display_as == 'L' %}
-                                <table class="table table-striped">
-                                    <tbody>
-                                        {% for package in packages %}
+                    <div class="card">
+                        <div class="card-header">{{ category.name }}</div>
+                        <div class="card-body">
+                            {% if packages %}
+                                {# If the packages are to be displayed as a list #}
+                                {% if category.display_as == 'L' %}
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            {% for package in packages %}
 
-                                            {% if package.active %}
+                                                {% if package.active %}
 
-                                                {# This will check to see if the package show date has been set. If it hasn't the package will be shown #}
-                                                {# if it has, then it will check to see if the date has been passed, if it has it won't show, it it hasn't it will. #}
-                                                {% if package.show_package_until is None or package.show_package_until and package.show_package_until|in_the_future %}
-                                                    <tr>
-                                                        <td>{{ package.name }}
+                                                    {# This will check to see if the package show date has been set. If it hasn't the package will be shown #}
+                                                    {# if it has, then it will check to see if the date has been passed, if it has it won't show, it it hasn't it will. #}
+                                                    {% if package.show_package_until is None or package.show_package_until and package.show_package_until|in_the_future %}
+                                                        <tr>
+                                                            <td>{{ package.name }}
 
-                                                            {# Check if there is a package countdown, if so display it #}
-                                                            {% if package.show_package_until %}
-                                                                <div style="font-size: 12px; display: inline; widht: 100%" class="text text-danger" id="show_package_until_id_{{ package.id }}">&nbsp; <strong><i class="fa fa-clock"></i> {{ language.translations.ending_soon }}</strong>
-                                                                    <script>
-                                                                        // Set the date we're counting down to
-                                                                        var countDownDate_{{ package.id }} = new Date("{{ package.show_package_until|date:'m d, Y H:i' }}").getTime();
+                                                                {# Check if there is a package countdown, if so display it #}
+                                                                {% if package.show_package_until %}
+                                                                    <div style="font-size: 12px; display: inline; widht: 100%" class="text text-danger" id="show_package_until_id_{{ package.id }}">&nbsp; <strong><i class="fa fa-clock"></i> {{ language.translations.ending_soon }}</strong>
+                                                                        <script>
+                                                                            // Set the date we're counting down to
+                                                                            var countDownDate_{{ package.id }} = new Date("{{ package.show_package_until|date:'m d, Y H:i' }}").getTime();
 
-                                                                        // Update the count down every 1 second
-                                                                        var x = setInterval(function() {
+                                                                            // Update the count down every 1 second
+                                                                            var x = setInterval(function() {
 
-                                                                            // Get todays date and time
-                                                                            var now = new Date().getTime();
+                                                                                // Get todays date and time
+                                                                                var now = new Date().getTime();
 
-                                                                            // Find the distance between now an the count down date
-                                                                            var distance = countDownDate_{{ package.id }} - now;
+                                                                                // Find the distance between now an the count down date
+                                                                                var distance = countDownDate_{{ package.id }} - now;
 
-                                                                            // Time calculations for days, hours, minutes and seconds
-                                                                            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                                                                            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                                                                            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                                                                            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                                                                                // Time calculations for days, hours, minutes and seconds
+                                                                                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                                                                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                                                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                                                                            // Display the result in the element with id="demo"
-                                                                            document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = '<strong><i class="fa fa-clock"></i> ' +days + "d " + hours + "h "
-                                                                                + minutes + "m " + seconds + "s</strong> ";
+                                                                                // Display the result in the element with id="demo"
+                                                                                document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = '<strong><i class="fa fa-clock"></i> ' +days + "d " + hours + "h "
+                                                                                    + minutes + "m " + seconds + "s</strong> ";
 
-                                                                            // If the count down is finished, write some text
-                                                                            if (distance < 0) {
-                                                                                clearInterval(x);
-                                                                                document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = "EXPIRED";
-                                                                            }
-                                                                        }, 1000);
-                                                                    </script>
-                                                                </div>
-                                                            {% endif %}
-                                                        </td>
-                                                        <td>
-                                                            {% if not package.allow_customer_change_price %}
-                                                                {% check_for_sale package.id webstore.id as package_on_sale %}
-                                                                {% if package_on_sale.is_on_sale %}
-                                                                    {% if 'allow_customer_to_change_price' in package_on_sale %}
-                                                                        {{ language.translations.you_decide_how_much }}
-                                                                    {% else %}
-                                                                        <span class="text-danger"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
-                                                                        <span class="text-success">{% get_price_using_currency package_on_sale.sale_price webstore %}</span>
-                                                                    {% endif %}
-                                                                {% else %}
-                                                                    {% get_price_using_currency package.price webstore %}
+                                                                                // If the count down is finished, write some text
+                                                                                if (distance < 0) {
+                                                                                    clearInterval(x);
+                                                                                    document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = "EXPIRED";
+                                                                                }
+                                                                            }, 1000);
+                                                                        </script>
+                                                                    </div>
                                                                 {% endif %}
-                                                            {% endif %}
-                                                        </td>
-                                                        <td>
-                                                            {# If the package is already in the cart then we display a remove button not a buy button #}
-                                                            {# First lets see if the cart has any contents #}
-                                                            {% if cart|length > 0 %}
-                                                                {# If there is stuff in the cart #}
-                                                                {# Check if that package is already in the cart #}
-                                                                {% if cart|contains_package:package.id %}
-                                                                    <form name="remove-from-cart" method="post" action="">
-                                                                        <input type="hidden" name="remove" value="true">
-                                                                        <input type="hidden" name="package_id" value="{{ package.id }}">
-                                                                        {% csrf_token %}
-                                                                        <input type="submit" value="{{ language.translations.remove }}" class="btn btn-danger btn-block">
-                                                                    </form>
-                                                                {% else %}
+                                                            </td>
+                                                            <td>
+                                                                {% if not package.allow_customer_change_price %}
+                                                                    {% check_for_sale package.id webstore.id as package_on_sale %}
+                                                                    {% if package_on_sale.is_on_sale %}
+                                                                        {% if 'allow_customer_to_change_price' in package_on_sale %}
+                                                                            {{ language.translations.you_decide_how_much }}
+                                                                        {% else %}
+                                                                            <span class="text-danger"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
+                                                                            <span class="text-success">{% get_price_using_currency package_on_sale.sale_price webstore %}</span>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        {% get_price_using_currency package.price webstore %}
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {# If the package is already in the cart then we display a remove button not a buy button #}
+                                                                {# First lets see if the cart has any contents #}
+                                                                {% if cart|length > 0 %}
+                                                                    {# If there is stuff in the cart #}
+                                                                    {# Check if that package is already in the cart #}
+                                                                    {% if cart|contains_package:package.id %}
+                                                                        <form name="remove-from-cart" method="post" action="">
+                                                                            <input type="hidden" name="remove" value="true">
+                                                                            <input type="hidden" name="package_id" value="{{ package.id }}">
+                                                                            {% csrf_token %}
+                                                                            <input type="submit" value="{{ language.translations.remove }}" class="btn btn-danger btn-block">
+                                                                        </form>
+                                                                    {% else %}
+                                                                        {# If not then just display the buy button #}
+                                                                        <button type="button" class="btn btn-secondary btn-block" data-toggle="modal" data-target="#package-{{ package.id }}">
+                                                                            <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
+                                                                        </button>
+                                                                    {% endif %}
                                                                     {# If not then just display the buy button #}
+                                                                {% else %}
                                                                     <button type="button" class="btn btn-secondary btn-block" data-toggle="modal" data-target="#package-{{ package.id }}">
                                                                         <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
                                                                     </button>
                                                                 {% endif %}
-                                                                {# If not then just display the buy button #}
-                                                            {% else %}
-                                                                <button type="button" class="btn btn-secondary btn-block" data-toggle="modal" data-target="#package-{{ package.id }}">
-                                                                    <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
-                                                                </button>
-                                                            {% endif %}
-                                                        </td>
-                                                    </tr>
+                                                            </td>
+                                                        </tr>
 
-                                                    <!-- Modal -->
-                                                    <div class="modal fade" id="package-{{ package.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                        <div class="modal-dialog" role="document">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title" id="exampleModalLabel">{{ package.name }}</h5>
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                        <span aria-hidden="true">&times;</span>
-                                                                    </button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    {% if package.image %}
-                                                                        <img style='float:left;height:170px; width:170px; margin-right:10px;' src="/{{ package.image.url }}"/>
-                                                                    {% endif %}
-                                                                    {{ package.description|safe }}
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <strong>
-                                                                        {% if package.allowas_customer_change_price %}
-                                                                            You choose price.
-                                                                        {% elif package.price == 0 %}
-                                                                            Free.
-                                                                        {% else %}
-                                                                            {% if not package.allow_customer_change_price %}
-                                                                            {% check_for_sale package.id webstore.id as package_on_sale %}
-                                                                            {% if package_on_sale.is_on_sale %}
-                                                                                {% if 'allow_customer_to_change_price' in package_on_sale %}
-                                                                                    {{ language.translations.you_decide_how_much }}
-                                                                                {% else %}
-                                                                                    <span class="text-danger"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
-                                                                                    <span class="text-success">{% get_price_using_currency package_on_sale.sale_price webstore %}</span>
-                                                                                {% endif %}
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="package-{{ package.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="exampleModalLabel">{{ package.name }}</h5>
+                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        {% if package.image %}
+                                                                            <img style='float:left;height:170px; width:170px; margin-right:10px;' src="/{{ package.image.url }}"/>
+                                                                        {% endif %}
+                                                                        {{ package.description|safe }}
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <strong>
+                                                                            {% if package.allowas_customer_change_price %}
+                                                                                You choose price.
+                                                                            {% elif package.price == 0 %}
+                                                                                Free.
                                                                             {% else %}
-                                                                                {% get_price_using_currency package.price webstore %}
-                                                                            {% endif %}
-                                                                        {% endif %}
-                                                                        {% endif %}
-                                                                    </strong>
-                                                                    <form name="add-to-cart" method="post" action="">
-                                                                        <input name="package_id" value="{{ package.id }}" type="hidden">
-                                                                        {% csrf_token %}
-                                                                        {% get_add_to_cart_buttons language package_payments package webstore as cart_button %}
-                                                                        {% if cart_button.is_allowed_to_purchase %}
-                                                                            {% if package.purchase_type == 'O' %}
-                                                                                <input type="submit" name="add_to_cart" class="btn btn-primary" value="{{ language.translations.add_to_cart }}">
-                                                                            {% elif package.purchase_type == 'S' %}
-                                                                                <input type="submit" name="add_to_cart" class="btn btn-primary" value="{{ language.translations.add_to_cart }}">
-                                                                            {% endif %}
-                                                                        {% else %}
-                                                                            <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="{{ cart_button.reason }}">
-                                                                                {% if package.purchase_type == 'O' %}
-                                                                                    <button class="btn btn-primary" style="pointer-events: none;" type="button" disabled>{{ language.translations.add_to_cart }}</button>
-                                                                                {% elif package.purchase_type == 'S' %}
-                                                                                    <button class="btn btn-primary" style="pointer-events: none;" type="button" disabled>{{ language.translations.subscribe }}</button>
-                                                                                {% endif %}
-                                                                            </span>
-                                                                        {% endif %}
-
-                                                                        {% if webstore.allow_gifting and not package.disable_gifting %}
-                                                                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                                                                {{ language.translations.gift_this_package }}
-                                                                            </button>
-                                                                            <div class="dropdown-menu dropdown-menu-right" style="width: 100%; padding: 10px;">
-                                                                                <div class="form-group">
-                                                                                    <input type="text" class="form-control" placeholder="{{ language.translations.enter_gift_ign }}" name="gifting_ign">
-                                                                                    <input class="btn btn-success btn-block btn-sm" type="submit" value="{{ language.translations.gift }}">
-                                                                                </div>
-                                                                            </div>
-                                                                        {% endif %}
-                                                                    </form>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                {% endif %}
-
-                                            {% endif %}
-
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% else %}
-
-                                <div class="row">
-                                    {% for package in packages %}
-
-                                        {% if package.active %}
-
-                                            {# This will check to see if the package show date has been set. If it hasn't the package will be shown #}
-                                            {# if it has, then it will check to see if the date has been passed, if it has it won't show, it it hasn't it will. #}
-                                            {% if package.show_package_until is None or package.show_package_until and package.show_package_until|in_the_future %}
-
-                                                <div class="col-md-4">
-                                                    <div class="text-center">
-                                                        {% if package.image %}
-                                                            <a data-toggle="modal" data-target="#package-{{ package.id }}"><img src="/{{ package.image.url }}" data-toggle="tooltip" data-html="true" title="{{ language.translations.click_more_details }}" width="190px" height="190px" style="border-radius: 5px;"/></a>
-                                                        {% else %}
-                                                            <a data-toggle="modal" data-target="#package-{{ package.id }}"><img src="/static/store_content/package_images/default_package_image.png" data-toggle="tooltip" data-html="true" title="{{ language.translations.click_more_details }}" width="190px" height="190px" style="border-radius: 5px;"/></a>
-                                                        {% endif %}
-                                                    </div>
-
-                                                    <div style="padding:8px; margin:0px; padding-bottom: 0px;">
-                                                        <div class="float-right">
-                                                            {# If the package is already in the cart then we display a remove button not a buy button #}
-                                                            {# First lets see if the cart has any contents #}
-                                                            {% if cart|length > 0 %}
-                                                                {# If there is stuff in the cart #}
-                                                                {# Check if that package is already in the cart #}
-                                                                {% if cart|contains_package:package.id %}
-                                                                    <form name="remove-from-cart" method="post" action="">
-                                                                        <input type="hidden" name="remove" value="true">
-                                                                        <input type="hidden" name="package_id" value="{{ package.id }}">
-                                                                        {% csrf_token %}
-                                                                        <input type="submit" value="{{ language.translations.remove }}" class="btn btn-sm btn-danger btn-block">
-                                                                    </form>
-                                                                {% else %}
-                                                                    {# If not then just display the buy button #}
-                                                                    <button type="button" class="btn btn-sm btn-secondary btn-block" data-toggle="modal" data-target="#package-{{ package.id }}">
-                                                                        <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
-                                                                    </button>
-                                                                {% endif %}
-                                                                {# If not then just display the buy button #}
-                                                            {% else %}
-                                                                <button type="button" class="btn btn-sm btn-secondary btn-block" data-toggle="modal" data-target="#package-{{ package.id }}">
-                                                                    <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
-                                                                </button>
-                                                            {% endif %}
-                                                        </div>
-                                                        <p style="padding-top:0px; margin:0px; font-size: 12px;">{{ package.name }}<br/>
-                                                            {% if package.show_package_until %}
-                                                                <div style="font-size: 12px;" class="text text-danger" id="show_package_until_id_{{ package.id }}"><strong><i class="fa fa-clock"></i> {{ language.translations.ending_soon }}</strong>
-                                                                    <script>
-                                                                        // Set the date we're counting down to
-                                                                        var countDownDate_{{ package.id }} = new Date("{{ package.show_package_until|date:'m d, Y H:i' }}").getTime();
-
-                                                                        // Update the count down every 1 second
-                                                                        var x = setInterval(function() {
-
-                                                                            // Get todays date and time
-                                                                            var now = new Date().getTime();
-
-                                                                            // Find the distance between now an the count down date
-                                                                            var distance = countDownDate_{{ package.id }} - now;
-
-                                                                            // Time calculations for days, hours, minutes and seconds
-                                                                            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                                                                            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                                                                            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                                                                            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                                                                            // Display the result in the element with id="demo"
-                                                                            document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = '<strong><i class="fa fa-clock"></i> ' +days + "d " + hours + "h "
-                                                                                + minutes + "m " + seconds + "s</strong> ";
-
-                                                                            // If the count down is finished, write some text
-                                                                            if (distance < 0) {
-                                                                                clearInterval(x);
-                                                                                document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = "EXPIRED";
-                                                                            }
-                                                                        }, 1000);
-                                                                    </script>
-                                                                </div>
-                                                            {% endif %}
-                                                        {% if not package.allow_customer_change_price %}
-                                                            {% if not package.allow_customer_change_price %}
-                                                                {% check_for_sale package.id webstore.id as package_on_sale %}
-                                                                {% if package_on_sale.is_on_sale %}
-                                                                    {% if 'allow_customer_to_change_price' in package_on_sale %}
-                                                                        {{ language.translations.you_decide_how_much }}
-                                                                    {% else %}
-                                                                        <span class="text-danger"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
-                                                                        <span class="text-success">{% get_price_using_currency package_on_sale.sale_price webstore %}</span>
-                                                                    {% endif %}
-                                                                {% else %}
-                                                                    {% get_price_using_currency package.price webstore %}
-                                                                {% endif %}
-                                                            {% endif %}
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-
-                                                <!-- Modal -->
-                                                    <div class="modal fade" id="package-{{ package.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                        <div class="modal-dialog" role="document">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title" id="exampleModalLabel">{{ package.name }}</h5>
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                        <span aria-hidden="true">&times;</span>
-                                                                    </button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    {% if package.image %}
-                                                                        <img style='float:left;height:170px; width:170px; margin-right:10px;' src="/{{ package.image.url }}"/>
-                                                                    {% endif %}
-                                                                    {{ package.description|safe }}
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <strong>
-                                                                        {% if package.allowas_customer_change_price %}
-                                                                            You choose price.
-                                                                        {% elif package.price == 0 %}
-                                                                            Free.
-                                                                        {% else %}
-                                                                            {% if not package.allow_customer_change_price %}
+                                                                                {% if not package.allow_customer_change_price %}
                                                                                 {% check_for_sale package.id webstore.id as package_on_sale %}
                                                                                 {% if package_on_sale.is_on_sale %}
                                                                                     {% if 'allow_customer_to_change_price' in package_on_sale %}
@@ -364,61 +362,242 @@
                                                                                     {% get_price_using_currency package.price webstore %}
                                                                                 {% endif %}
                                                                             {% endif %}
-                                                                        {% endif %}
-                                                                    </strong>
-                                                                    <form name="add-to-cart" method="post" action="">
-                                                                        <input name="package_id" value="{{ package.id }}" type="hidden">
-                                                                        {% csrf_token %}
-                                                                        {% get_add_to_cart_buttons language package_payments package webstore as cart_button %}
-                                                                        {% if cart_button.is_allowed_to_purchase %}
-                                                                            {% if package.purchase_type == 'O' %}
-                                                                                <input type="submit" name="add_to_cart" class="btn btn-primary" value="{{ language.translations.add_to_cart }}">
-                                                                            {% elif package.purchase_type == 'S' %}
-                                                                                <input type="submit" name="add_to_cart" class="btn btn-primary" value="{{ language.translations.add_to_cart }}">
                                                                             {% endif %}
-                                                                        {% else %}
-                                                                            <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="{{ cart_button.reason }}">
+                                                                        </strong>
+                                                                        <form name="add-to-cart" method="post" action="">
+                                                                            <input name="package_id" value="{{ package.id }}" type="hidden">
+                                                                            {% csrf_token %}
+                                                                            {% get_add_to_cart_buttons language package_payments package webstore as cart_button %}
+                                                                            {% if cart_button.is_allowed_to_purchase %}
                                                                                 {% if package.purchase_type == 'O' %}
-                                                                                    <button class="btn btn-primary" style="pointer-events: none;" type="button" disabled>{{ language.translations.add_to_cart }}</button>
+                                                                                    <input type="submit" name="add_to_cart" class="btn btn-primary" value="{{ language.translations.add_to_cart }}">
                                                                                 {% elif package.purchase_type == 'S' %}
-                                                                                    <button class="btn btn-primary" style="pointer-events: none;" type="button" disabled>{{ language.translations.subscribe }}</button>
+                                                                                    <input type="submit" name="add_to_cart" class="btn btn-primary" value="{{ language.translations.add_to_cart }}">
                                                                                 {% endif %}
-                                                                            </span>
-                                                                        {% endif %}
-                                                                        {% if webstore.allow_gifting and not package.disable_gifting %}
-                                                                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                                                                {{ language.translations.gift_this_package }}
-                                                                            </button>
-                                                                            <div class="dropdown-menu dropdown-menu-right" style="width: 100%; padding: 10px;">
-                                                                                <div class="form-group">
-                                                                                    <input type="text" class="form-control" placeholder="{{ language.translations.enter_gift_ign }}" name="gifting_ign">
-                                                                                    <input class="btn btn-success btn-block btn-sm" type="submit" value="{{ language.translations.gift }}">
+                                                                            {% else %}
+                                                                                <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="{{ cart_button.reason }}">
+                                                                                    {% if package.purchase_type == 'O' %}
+                                                                                        <button class="btn btn-primary" style="pointer-events: none;" type="button" disabled>{{ language.translations.add_to_cart }}</button>
+                                                                                    {% elif package.purchase_type == 'S' %}
+                                                                                        <button class="btn btn-primary" style="pointer-events: none;" type="button" disabled>{{ language.translations.subscribe }}</button>
+                                                                                    {% endif %}
+                                                                                </span>
+                                                                            {% endif %}
+
+                                                                            {% if webstore.allow_gifting and not package.disable_gifting and package not in packages_with_discord_actions %}
+                                                                                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                                                                                    {{ language.translations.gift_this_package }}
+                                                                                </button>
+                                                                                <div class="dropdown-menu dropdown-menu-right" style="width: 100%; padding: 10px;">
+                                                                                    <div class="form-group">
+                                                                                        <input type="text" class="form-control" placeholder="{{ language.translations.enter_gift_ign }}" name="gifting_ign">
+                                                                                        <input class="btn btn-success btn-block btn-sm" type="submit" value="{{ language.translations.gift }}">
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
-                                                                        {% endif %}
-                                                                    </form>
+                                                                            {% endif %}
+                                                                        </form>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                    {% endif %}
+
+                                                {% endif %}
+
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% else %}
+                                    <div class="row">
+                                        {% for package in packages %}
+
+                                            {% if package.active %}
+
+                                                {# This will check to see if the package show date has been set. If it hasn't the package will be shown #}
+                                                {# if it has, then it will check to see if the date has been passed, if it has it won't show, it it hasn't it will. #}
+                                                {% if package.show_package_until is None or package.show_package_until and package.show_package_until|in_the_future %}
+
+                                                    <div class="col-md-4">
+                                                        <div class="text-center">
+                                                            {% if package.image %}
+                                                                <a data-toggle="modal" data-target="#package-{{ package.id }}"><img src="/{{ package.image.url }}" data-toggle="tooltip" data-html="true" title="{{ language.translations.click_more_details }}" width="190px" height="190px" style="border-radius: 5px;"/></a>
+                                                            {% else %}
+                                                                <a data-toggle="modal" data-target="#package-{{ package.id }}"><img src="/static/store_content/package_images/default_package_image.png" data-toggle="tooltip" data-html="true" title="{{ language.translations.click_more_details }}" width="190px" height="190px" style="border-radius: 5px;"/></a>
+                                                            {% endif %}
+                                                        </div>
+
+                                                        <div style="padding:8px; margin:0px; padding-bottom: 0px;">
+                                                            <div class="float-right">
+                                                                {# If the package is already in the cart then we display a remove button not a buy button #}
+                                                                {# First lets see if the cart has any contents #}
+                                                                {% if cart|length > 0 %}
+                                                                    {# If there is stuff in the cart #}
+                                                                    {# Check if that package is already in the cart #}
+                                                                    {% if cart|contains_package:package.id %}
+                                                                        <form name="remove-from-cart" method="post" action="">
+                                                                            <input type="hidden" name="remove" value="true">
+                                                                            <input type="hidden" name="package_id" value="{{ package.id }}">
+                                                                            {% csrf_token %}
+                                                                            <input type="submit" value="{{ language.translations.remove }}" class="btn btn-sm btn-danger btn-block">
+                                                                        </form>
+                                                                    {% else %}
+                                                                        {# If not then just display the buy button #}
+                                                                        <button type="button" class="btn btn-sm btn-secondary btn-block" data-toggle="modal" data-target="#package-{{ package.id }}">
+                                                                            <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
+                                                                        </button>
+                                                                    {% endif %}
+                                                                    {# If not then just display the buy button #}
+                                                                {% else %}
+                                                                    <button type="button" class="btn btn-sm btn-secondary btn-block" data-toggle="modal" data-target="#package-{{ package.id }}">
+                                                                        <i class="fa fa-cart-plus"></i> {{ language.translations.buy }}
+                                                                    </button>
+                                                                {% endif %}
+                                                            </div>
+                                                            <p style="padding-top:0px; margin:0px; font-size: 12px;">{{ package.name }}<br/>
+                                                                {% if package.show_package_until %}
+                                                                    <div style="font-size: 12px;" class="text text-danger" id="show_package_until_id_{{ package.id }}"><strong><i class="fa fa-clock"></i> {{ language.translations.ending_soon }}</strong>
+                                                                        <script>
+                                                                            // Set the date we're counting down to
+                                                                            var countDownDate_{{ package.id }} = new Date("{{ package.show_package_until|date:'m d, Y H:i' }}").getTime();
+
+                                                                            // Update the count down every 1 second
+                                                                            var x = setInterval(function() {
+
+                                                                                // Get todays date and time
+                                                                                var now = new Date().getTime();
+
+                                                                                // Find the distance between now an the count down date
+                                                                                var distance = countDownDate_{{ package.id }} - now;
+
+                                                                                // Time calculations for days, hours, minutes and seconds
+                                                                                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                                                                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                                                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                                                                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                                                                                // Display the result in the element with id="demo"
+                                                                                document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = '<strong><i class="fa fa-clock"></i> ' +days + "d " + hours + "h "
+                                                                                    + minutes + "m " + seconds + "s</strong> ";
+
+                                                                                // If the count down is finished, write some text
+                                                                                if (distance < 0) {
+                                                                                    clearInterval(x);
+                                                                                    document.getElementById("show_package_until_id_{{ package.id }}").innerHTML = "EXPIRED";
+                                                                                }
+                                                                            }, 1000);
+                                                                        </script>
+                                                                    </div>
+                                                                {% endif %}
+                                                            {% if not package.allow_customer_change_price %}
+                                                                {% if not package.allow_customer_change_price %}
+                                                                    {% check_for_sale package.id webstore.id as package_on_sale %}
+                                                                    {% if package_on_sale.is_on_sale %}
+                                                                        {% if 'allow_customer_to_change_price' in package_on_sale %}
+                                                                            {{ language.translations.you_decide_how_much }}
+                                                                        {% else %}
+                                                                            <span class="text-danger"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
+                                                                            <span class="text-success">{% get_price_using_currency package_on_sale.sale_price webstore %}</span>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        {% get_price_using_currency package.price webstore %}
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </div>
                                                     </div>
+
+                                                    <!-- Modal -->
+                                                        <div class="modal fade" id="package-{{ package.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="exampleModalLabel">{{ package.name }}</h5>
+                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        {% if package.image %}
+                                                                            <img style='float:left;height:170px; width:170px; margin-right:10px;' src="/{{ package.image.url }}"/>
+                                                                        {% endif %}
+                                                                        {{ package.description|safe }}
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <strong>
+                                                                            {% if package.allowas_customer_change_price %}
+                                                                                You choose price.
+                                                                            {% elif package.price == 0 %}
+                                                                                Free.
+                                                                            {% else %}
+                                                                                {% if not package.allow_customer_change_price %}
+                                                                                    {% check_for_sale package.id webstore.id as package_on_sale %}
+                                                                                    {% if package_on_sale.is_on_sale %}
+                                                                                        {% if 'allow_customer_to_change_price' in package_on_sale %}
+                                                                                            {{ language.translations.you_decide_how_much }}
+                                                                                        {% else %}
+                                                                                            <span class="text-danger"><s>{% get_price_using_currency package_on_sale.original_price webstore %}</s></span>
+                                                                                            <span class="text-success">{% get_price_using_currency package_on_sale.sale_price webstore %}</span>
+                                                                                        {% endif %}
+                                                                                    {% else %}
+                                                                                        {% get_price_using_currency package.price webstore %}
+                                                                                    {% endif %}
+                                                                                {% endif %}
+                                                                            {% endif %}
+                                                                        </strong>
+                                                                        <form name="add-to-cart" method="post" action="">
+                                                                            <input name="package_id" value="{{ package.id }}" type="hidden">
+                                                                            {% csrf_token %}
+                                                                            {% get_add_to_cart_buttons language package_payments package webstore as cart_button %}
+                                                                            {% if cart_button.is_allowed_to_purchase %}
+                                                                                {% if package.purchase_type == 'O' %}
+                                                                                    <input type="submit" name="add_to_cart" class="btn btn-primary" value="{{ language.translations.add_to_cart }}">
+                                                                                {% elif package.purchase_type == 'S' %}
+                                                                                    <input type="submit" name="add_to_cart" class="btn btn-primary" value="{{ language.translations.add_to_cart }}">
+                                                                                {% endif %}
+                                                                            {% else %}
+                                                                                <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="{{ cart_button.reason }}">
+                                                                                    {% if package.purchase_type == 'O' %}
+                                                                                        <button class="btn btn-primary" style="pointer-events: none;" type="button" disabled>{{ language.translations.add_to_cart }}</button>
+                                                                                    {% elif package.purchase_type == 'S' %}
+                                                                                        <button class="btn btn-primary" style="pointer-events: none;" type="button" disabled>{{ language.translations.subscribe }}</button>
+                                                                                    {% endif %}
+                                                                                </span>
+                                                                            {% endif %}
+                                                                            {% if webstore.allow_gifting and not package.disable_gifting and package not in packages_with_discord_actions %}
+                                                                                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                                                                                    {{ language.translations.gift_this_package }}
+                                                                                </button>
+                                                                                <div class="dropdown-menu dropdown-menu-right" style="width: 100%; padding: 10px;">
+                                                                                    <div class="form-group">
+                                                                                        <input type="text" class="form-control" placeholder="{{ language.translations.enter_gift_ign }}" name="gifting_ign">
+                                                                                        <input class="btn btn-success btn-block btn-sm" type="submit" value="{{ language.translations.gift }}">
+                                                                                    </div>
+                                                                                </div>
+                                                                            {% endif %}
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                {% endif %}
 
                                             {% endif %}
 
-                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
 
-                                    {% endfor %}
-                                </div>
+                                {% endif %}
 
+                            {% else %}
+                                <p>There are no packages in this category yet.</p>
                             {% endif %}
 
-                        {% else %}
-                            <p>There are no packages in this category yet.</p>
-                        {% endif %}
-
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
     </div>
     <!-- End Main Category Content -->
 

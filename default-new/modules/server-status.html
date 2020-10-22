@@ -1,0 +1,37 @@
+{% load cart %}
+
+{% load modules %}
+
+{% server_status_module module as server_status %}
+{% if server_status.status or server_status.module.dont_display_if_offline is False %}
+    <div class="module {% if webstore_config.vertical_nav %}flex-1 module-min-width{% else %}w-full{% endif %}">
+        <div class="module-body">
+            <div class="module-header">
+                <h3>{{ module.header }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    {% if server_status.status %}
+                    <h3>
+                        <span class="badge badge-success">
+                            <small>{{ language.translations.online }}</small>
+                        </span>
+                    <br/>
+                    {{ server_status.module.hostname }}<br/>
+                    <small>{{ server_status.current_players }} / {{ server_status.max_players }} {{ language.translations.players_online }}</small>
+                    </h3>
+                    {% else %}
+                    <h3>
+                        <span class="badge badge-danger">
+                            <small>{{ language.translations.offline }}</small>
+                        </span>
+                    <br/>
+                    {{ server_status.module.hostname }}<br/>
+                    </h3>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+

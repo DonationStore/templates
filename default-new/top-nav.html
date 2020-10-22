@@ -1,0 +1,166 @@
+{% load static %}
+
+{% load currency %}
+
+<!-- Top Nav -->
+<div class="top-nav flex-wrap lg:mb-12 mb-8">
+    <div class="lg:w-1/2 w-full flex justify-center lg:justify-start mb-4 lg:mb-0">
+        {% if webstore.logo %}
+            <a href="/"><img src="/{{ webstore.logo }}" class="logo" alt="Webstore Logo"></a>
+        {% else %}
+            <img src="{% static 'assets/images/logo_white.png' %}" class="logo" alt="Default Store Logo"><br/>
+            This logo has not been set yet. Set it in your control panel.
+        {% endif %}
+    </div>
+    <div class="lg:w-1/2 w-full">
+        <div class="lg:top-nav-buttons flex lg:justify-end justify-center">
+            <button class="top-nav-button bg-secondary relative" id="open-cart-drawer">
+                {% if cart %}
+                    <i class="fa fa-shopping-cart fa-fw my-auto mr-2"></i><span class="hidden sm:block">{{ language.translations.your_cart }}: </span> {% get_price_using_currency cart_total|floatformat:2 webstore %}
+                    <span class="cart-item-counter">{{ cart|length }}</span>
+                {% else %}
+                    <i class="fa fa-shopping-cart fa-fw my-auto mr-2"></i> {{ language.translations.no_items_in_cart }}
+                {% endif %}
+            </button>
+            <div class="">
+                <button class="top-nav-button relative bg-secondary" id="currency-select">
+                    <span class="text-md ml-2 my-auto">{% if request.session.chosen_currency %} {{ request.session.chosen_currency }}{% else %}{{ webstore.currency }}{% endif %}</span> <i class="fa fa-chevron-down my-auto ml-2"></i>
+                </button>
+                <div class="popover-menu currency-selector hidden" id="currency-selector">
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'AUD' %} active{% endif %}" data-tippy-content="Australian Dollar" data-tippy-placement="right" href="/currency/AUD?next={% firstof request.path '/' %}">
+                        AUD
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'BRL' %} active{% endif %}" data-tippy-content="Brazilian Real" data-tippy-placement="right" href="/currency/BRL?next={% firstof request.path '/' %}">
+                        BRL
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'CAD' %} active{% endif %}" data-tippy-content="Canadian Dollar" data-tippy-placement="right" href="/currency/CAD?next={% firstof request.path '/' %}">
+                        CAD
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'CHF' %} active{% endif %}" data-tippy-content="Swiss Franc" data-tippy-placement="right" href="/currency/CHF?next={% firstof request.path '/' %}">
+                        CHF
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'CNY' %} active{% endif %}" data-tippy-content="Chinese Yuan" data-tippy-placement="right" href="/currency/CNY?next={% firstof request.path '/' %}">
+                        CNY
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'CZK' %} active{% endif %}" data-tippy-content="Czech Koruna" data-tippy-placement="right" href="/currency/CZK?next={% firstof request.path '/' %}">
+                        CZK
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'DKK' %} active{% endif %}" data-tippy-content="Danish Krone" data-tippy-placement="right" href="/currency/DKK?next={% firstof request.path '/' %}">
+                        DKK
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'EUR' %} active{% endif %}" data-tippy-content="Euro" data-tippy-placement="right" href="/currency/EUR?next={% firstof request.path '/' %}">
+                        EUR
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'GBP' %} active{% endif %}" data-tippy-content="Pound Sterling" data-tippy-placement="right" href="/currency/GBP?next={% firstof request.path '/' %}">
+                        GBP
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'HKD' %} active{% endif %}" data-tippy-content="Hong Kong Dollar" data-tippy-placement="right" href="/currency/HKD?next={% firstof request.path '/' %}">
+                        HKD
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'HUF' %} active{% endif %}" data-tippy-content="Forint" data-tippy-placement="right" href="/currency/HUF?next={% firstof request.path '/' %}">
+                        HUF
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'ILS' %} active{% endif %}" data-tippy-content="New Israeli Sheqel" data-tippy-placement="right" href="/currency/ILS?next={% firstof request.path '/' %}">
+                        ILS
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'JPY' %} active{% endif %}" data-tippy-content="Yen" data-tippy-placement="right" href="/currency/JPY?next={% firstof request.path '/' %}">
+                        JPY
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'MXN' %} active{% endif %}" data-tippy-content="Mexican Peso" data-tippy-placement="right" href="/currency/MXN?next={% firstof request.path '/' %}">
+                        MXN
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'MYR' %} active{% endif %}" data-tippy-content="Malaysian Ringgit" data-tippy-placement="right" href="/currency/MYR?next={% firstof request.path '/' %}">
+                        MYR
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'NOK' %} active{% endif %}" data-tippy-content="Norwegian Krone" data-tippy-placement="right" href="/currency/NOK?next={% firstof request.path '/' %}">
+                        NOK
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'NZD' %} active{% endif %}" data-tippy-content="New Zealand Dollar" data-tippy-placement="right" href="/currency/NZD?next={% firstof request.path '/' %}">
+                        NZD
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'PHP' %} active{% endif %}" data-tippy-content="Philippine Peso" data-tippy-placement="right" href="/currency/PHP?next={% firstof request.path '/' %}">
+                        PHP
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'PLN' %} active{% endif %}" data-tippy-content="Zloty" data-tippy-placement="right" href="/currency/PLN?next={% firstof request.path '/' %}">
+                        PLN
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'RUB' %} active{% endif %}" data-tippy-content="Russian Ruble" data-tippy-placement="right" href="/currency/RUB?next={% firstof request.path '/' %}">
+                        RUB
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'SEK' %} active{% endif %}" data-tippy-content="Swedish Krona" data-tippy-placement="right" href="/currency/SEK?next={% firstof request.path '/' %}">
+                        SEK
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'SGB' %} active{% endif %}" data-tippy-content="Singapore Dollar" data-tippy-placement="right" href="/currency/SGD?next={% firstof request.path '/' %}">
+                        SGD
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'THB' %} active{% endif %}" data-tippy-content="Baht" data-tippy-placement="right" href="/currency/THB?next={% firstof request.path '/' %}">
+                        THB
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'TRY' %} active{% endif %}" data-tippy-content="Turkish Lira" data-tippy-placement="right" href="/currency/TRY?next={% firstof request.path '/' %}">
+                        TRY
+                    </a>
+                    <a class="currency tooltip{% if request.session.chosen_currency == 'USD' %} active{% endif %}" data-tippy-content="US Dollar" data-tippy-placement="right" href="/currency/USD?next={% firstof request.path '/' %}">
+                        USD
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <button class="top-nav-button relative bg-secondary" id="language-select">
+                    {% if request.session.language %}
+                        {% get_country_flag_code request.session.language 'assets/css/flags/4x3/' as language_flag_path %}
+                    {% else %}
+                        {% get_country_flag_code webstore.language 'assets/css/flags/4x3/' as language_flag_path %}
+                    {% endif %}
+                    <img src="{% static language_flag_path %}" alt="Chosen Language Flag" class="h-5 mr-2 my-auto rounded-sm">
+                    {{ language.translations.language }} <i class="fa fa-chevron-down ml-2 my-auto"></i>
+                </button>
+
+                <div class="popover-menu language-selector hidden -ml-2" id="language-selector">
+                    <div class="grid grid-cols-3 gap-4">
+                        <a class="language" href="/language/bg_BG?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/bg.svg' %}" alt="Bulgarian Flag"> Bulgarian
+                        </a>
+                        <a class="language" href="/language/nl_NL?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/nl.svg' %}" alt="Dutch Flag"> Dutch
+                        </a>
+                        <a class="language" href="/language/en_IE?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/gb.svg' %}" alt="English Flag"> English
+                        </a>
+                        <a class="language" href="/language/et_EE?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/ee.svg' %}" alt="Estonian Flag"> Estonian
+                        </a>
+                        <a class="language" href="/language/fi_FI?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/fi.svg' %}" alt="Finnish Flag"> Finnish
+                        </a>
+                        <a class="language" href="/language/fr_FR?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/fr.svg' %}" alt="French Flag"> French
+                        </a>
+                        <a class="language" href="/language/de_DE?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/de.svg' %}" alt="German Flag"> German
+                        </a>
+                        <a class="language" href="/language/is_IS?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/is.svg' %}" alt="Icelandic Flag"> Icelandic
+                        </a>
+                        <a class="language" href="/language/it_IT?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/it.svg' %}" alt="Italian Flag"> Italian
+                        </a>
+                        <a class="language" href="/language/pl_PL?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/pl.svg' %}" alt="Polish Flag"> Polish
+                        </a>
+                        <a class="language" href="/language/pt_PT?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/pt.svg' %}" alt="Portuguese Flag"> Portuguese
+                        </a>
+                        <a class="language" href="/language/ro_RO?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/ro.svg' %}" alt="Romanian Flag"> Romanian
+                        </a>
+                        <a class="language" href="/language/es_ES?next={% firstof request.path '/' %}">
+                            <img src="{% static 'assets/css/flags/4x3/es.svg' %}" alt="Spanish Flag"> Spanish
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Top Nav -->

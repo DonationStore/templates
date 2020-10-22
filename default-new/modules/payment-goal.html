@@ -1,0 +1,21 @@
+{% load cart %}
+
+{% load modules %}
+
+{% payment_goal_module module as payment_goal %}
+<div class="module {% if webstore_config.vertical_nav %}flex-1 module-min-width{% else %}w-full{% endif %}">
+    <div class="module-body">
+        <div class="module-header">
+            {{ module.header }}
+        </div>
+        <div class="text-center">
+            {% if payment_goal.module.show_amount %}
+                {{ payment_goal.amount }}/{{ payment_goal.module.goal_target }}
+            {% endif %}
+            {{ payment_goal.percentage_of_total }}%
+        </div>
+        <div class="progress mt-2">
+            <div class="progress-bar" style="width: {% if payment_goal.percentage_of_total > 100 %}100{% else %}{{ payment_goal.percentage_of_total }}{% endif %}%"></div>
+        </div>
+    </div>
+</div>

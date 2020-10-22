@@ -1,0 +1,7 @@
+{% load cart %}
+
+{% load modules %}
+
+{% discord_module module as discord_module %}
+
+<iframe class="px-2 mb-2" src="https://discordapp.com/widget?id={{ discord_module.server_id }}&theme={{ discord_module.theme }}" width="100%" height="500" allowtransparency="true" frameborder="0"></iframe>
